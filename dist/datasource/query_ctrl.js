@@ -61,12 +61,13 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
       _export('BosunDatasourceQueryCtrl', BosunDatasourceQueryCtrl = function (_QueryCtrl) {
         _inherits(BosunDatasourceQueryCtrl, _QueryCtrl);
 
-        function BosunDatasourceQueryCtrl($scope, $injector, uiSegmentSrv) {
+        function BosunDatasourceQueryCtrl($scope, $injector, $sce, uiSegmentSrv) {
           _classCallCheck(this, BosunDatasourceQueryCtrl);
 
-          var _this = _possibleConstructorReturn(this, (BosunDatasourceQueryCtrl.__proto__ || Object.getPrototypeOf(BosunDatasourceQueryCtrl)).call(this, $scope, $injector));
+          var _this = _possibleConstructorReturn(this, (BosunDatasourceQueryCtrl.__proto__ || Object.getPrototypeOf(BosunDatasourceQueryCtrl)).call(this, $scope, $injector, $sce));
 
           _this.scope = $scope;
+          _this.sce = $sce
           _this.queryHelper = {};
           _this.uiSegmentSrv = uiSegmentSrv;
           _this.target.expandHelper = 0;
@@ -154,6 +155,27 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
         }, {
           key: 'onChangeInternal',
           value: function onChangeInternal() {
+            console.log("HI")
+            this.panelCtrl.refresh(); // Asks the panel to refresh data.
+          }
+        }, {
+          key: 'addNewVariable',
+          value: function addNewVariable() {
+            console.log("Add new variable was called")
+            console.log(this)
+            if(!this.scope.Variables){ this.scope.Variables = ''}
+            //Should be tidied later for security purposes
+            this.scope.Variables = this.sce.trustAsHtml(this.scope.Variables+
+              `
+              <div class="gf-form" style="width:80%;align-items:flex-start;">
+                <label class="gf-form-label query-keyword">
+                  Final Query
+                </label>
+                <textarea
+                  class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="key" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                </textarea>
+              </div>
+              `)
             this.panelCtrl.refresh(); // Asks the panel to refresh data.
           }
         }, {
