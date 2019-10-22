@@ -167,13 +167,85 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
             //Should be tidied later for security purposes
             this.scope.Variables = this.sce.trustAsHtml(this.scope.Variables+
               `
+              <div class="gf-form" style="width:80%;align-items:flex-start;margin-bottom:15px;">
+                <label class="gf-form-label query-keyword">
+                  Variable
+                </label>
+                <input
+                  class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="variable name" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                </input>
+                <input class="gf-form-input gf-form-input ng-valid ng-empty ng-dirty ng-valid-parse ng-touched" rows="1" ng-model="ctrl.target.expr" spellcheck='false' placeholder='value'
+                    data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                 </input>
+              </div>
+              `)
+            this.panelCtrl.refresh(); // Asks the panel to refresh data.
+          }
+        }, {
+          key: 'addNewVariableQ',
+          value: function addNewVariableQ() {
+            console.log("Add new variableQ was called")
+            console.log(this)
+            if(!this.scope.Variables){ this.scope.Variables = ''}
+            //Should be tidied later for security purposes
+            this.scope.Variables = this.sce.trustAsHtml(this.scope.Variables+
+              `
               <div class="gf-form" style="width:80%;align-items:flex-start;">
                 <label class="gf-form-label query-keyword">
-                  Final Query
+                  Query Variable
                 </label>
-                <textarea
-                  class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="key" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
-                </textarea>
+                <input
+                  class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="query variable name" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                </input>
+              </div>
+              <div class="gf-form" style="width:80%;align-items:flex-start;">
+                <label class="gf-form-label query-keyword">
+                  Metric
+                </label>
+                <input
+                  class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="query variable name" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                </input>
+              </div>
+              <div class="gf-form" style="width:80%;align-items:flex-start;">
+                <label class="gf-form-label query-keyword">
+                  Tags
+                </label>
+                <label class="gf-form-label query-keyword"ng-click="">
+                    +
+                </label>
+              </div>
+              <div class="gf-form" style="width:80%;align-items:flex-start;">
+                <label class="gf-form-label query-keyword">
+                  Agg
+                </label>
+                <input
+                  class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="zimsum(choose)" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                </input>
+              </div>
+              <div class="gf-form" style="width:80%;align-items:flex-start;">
+                <label class="gf-form-label query-keyword">
+                  Downsample
+                </label>
+                <input
+                  class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="Choose" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                </input>
+                <input
+                  class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="1h" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                </input>
+                <input
+                  class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="Choose" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                </input>
+              </div>
+              <div class="gf-form" style="width:80%;align-items:flex-start;margin-bottom:15px;">
+                <label class="gf-form-label query-keyword">
+                  Query Args
+                </label>
+                <input
+                  class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="startDuration" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                </input>
+                <input
+                  class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="endDuration" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                </input>
               </div>
               `)
             this.panelCtrl.refresh(); // Asks the panel to refresh data.

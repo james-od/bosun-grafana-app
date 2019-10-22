@@ -1,14 +1,17 @@
 <query-editor-row query-ctrl="ctrl">
     <div class="gf-form-inline" style="align-items:flex-start;">
-        <div class="gf-form" style="width:80%;align-items:flex-start;">
+      <div ng-bind-html="Variables"></div>
+
+      <div class="gf-form" style="width:80%;align-items:flex-start;">
           <div class="gf-form" style="width:80%;align-items:flex-start;">
             <label class="gf-form-label query-keyword"ng-click="ctrl.addNewVariable()">
-              +
+              Var +
+            </label>
+            <label class="gf-form-label query-keyword"ng-click="ctrl.addNewVariableQ()">
+              Query +
             </label>
           </div>
         </div>
-
-      <div ng-bind-html="Variables"></div>
 
       <div class="gf-form" style="width:80%;align-items:flex-start;">
         <label class="gf-form-label query-keyword">
