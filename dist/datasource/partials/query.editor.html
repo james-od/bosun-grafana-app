@@ -1,13 +1,117 @@
 <query-editor-row query-ctrl="ctrl">
-    <div class="gf-form-inline" style="align-items:flex-start;">
-      <div ng-bind-html="Variables"></div>
+
+          <div ng-repeat="queryVariable in queryVariables">
+
+            <div ng-if="queryVariable.type == 'variable'">
+
+              <div class="gf-form" style="width:80%;align-items:flex-start;margin-bottom:15px;">
+                <label class="gf-form-label query-keyword">
+                  Variable
+                </label>
+                <input
+                  class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="variable name" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                </input>
+                <input class="gf-form-input gf-form-input ng-valid ng-empty ng-dirty ng-valid-parse ng-touched" rows="1" ng-model="ctrl.target.expr" spellcheck='false' placeholder='value'
+                       data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                </input>
+              </div>
+
+            </div>
+
+            <div ng-if="queryVariable.type == 'queryVariable'">
+              <div id="query-variable-{{$index}}" class="gf-form-inline" style="align-items:flex-start; margin-bottom: 15px">
+
+                <div class="gf-form" style="width:80%;align-items:flex-start;">
+                  <label class="gf-form-label query-keyword">
+                    Query Variable
+                  </label>
+                  <input
+                    class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="query variable name" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                  </input>
+                </div>
+                <div class="gf-form" style="width:80%;align-items:flex-start;">
+                  <label class="gf-form-label query-keyword">
+                    Query Function
+                  </label>
+                  <select ng-model="queryfunc" class="gf-form-input">
+                    <option ng-repeat="queryFunction in queryFunctions">{{queryFunction.func}}</option>
+                  </select>
+
+                </div>
+                <div class="gf-form" style="width:80%;align-items:flex-start;">
+                  <label class="gf-form-label query-keyword">
+                    Metric
+                  </label>
+                  <input
+                    class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="query variable name" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                  </input>
+                </div>
+                <div class="gf-form" style="width:80%;align-items:flex-start;">
+                  <label class="gf-form-label query-keyword">
+                    Tags
+                  </label>
+                  <label class="gf-form-label query-keyword"ng-click="ctrl.addNewVariableQ()">
+                    +
+                  </label>
+                </div>
+                <div class="gf-form" style="width:80%;align-items:flex-start;" ng-query-ctrl="ctrl">
+                  <label class="gf-form-label query-keyword">
+                    Agg
+                  </label>
+                  <select class="gf-form-input">
+                    <option ng-repeat="aggOption in aggOptions">{{aggOption.text}}</option>
+                  </select>
+                </div>
+                <div class="gf-form" style="width:80%;align-items:flex-start;">
+                  <label class="gf-form-label query-keyword">
+                    Downsample
+                  </label>
+                  <select class="gf-form-input">
+                    <option ng-repeat="aggOption in aggOptions">{{aggOption.text}}</option>
+                  </select>
+                  <input
+                    class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="1h" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                  </input>
+                  <select class="gf-form-input">
+                    <option ng-repeat="fillPolicy in fillPolicies">{{fillPolicy.text}}</option>
+                  </select>
+                </div>
+                <div class="gf-form" style="width:80%;align-items:flex-start;margin-bottom:15px;">
+                  <label class="gf-form-label query-keyword">
+                    Query Args
+                  </label>
+                  
+                  <input
+                    ng-if="queryfunc=='q' || queryfunc=='change' || queryfunc=='count'" class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="startDuration" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                  </input>
+                  <input
+                    ng-if="queryfunc=='q' || queryfunc=='change' || queryfunc=='count'" class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="endDuration" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                  </input>
+                  <input
+                    ng-if="queryfunc=='band' || queryfunc=='over' || queryfunc=='shiftBand' || queryfunc=='window'" class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="duration" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                  </input>
+                  <input
+                    ng-if="queryfunc=='band' || queryfunc=='over' || queryfunc=='shiftBand' || queryfunc=='window'" class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="period" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                  </input>
+                  <input
+                    ng-if="queryfunc=='band' || queryfunc=='over' || queryfunc=='shiftBand' || queryfunc=='window'" class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="num" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                  </input>
+                  <input
+                    ng-if="queryfunc=='window'" class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="funcName" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                  </input>
+                </div>
+                <div ng-model="elem$index" />
+              </div>
+            </div>
+        </div>
+
 
       <div class="gf-form" style="width:80%;align-items:flex-start;">
           <div class="gf-form" style="width:80%;align-items:flex-start;">
-            <label class="gf-form-label query-keyword"ng-click="ctrl.addNewVariable()">
+            <label class="gf-form-label query-keyword" ng-click="ctrl.addNewVariable()">
               Var +
             </label>
-            <label class="gf-form-label query-keyword"ng-click="ctrl.addNewVariableQ()">
+            <label class="gf-form-label query-keyword" ng-click="ctrl.addNewVariableQ()">
               Query +
             </label>
           </div>

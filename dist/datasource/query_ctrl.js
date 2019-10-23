@@ -79,6 +79,18 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
           _this.suggestQuery = _this.suggestQuery.bind(_this);
           _this.suggestTagValues = _this.suggestTagValues.bind(_this);
           _this.filterTypes = ["Group By", "Filter"];
+          _this.scope.queryVariables = [];
+          _this.scope.aggOptions = [{text: 'avg'}, {text: 'count'}, {text: 'dev'}, {text: 'diff'}, {text: 'ep50r3'}, {text: 'ep50r7'}, {text: 'ep75r3'}, {text: 'ep75r7'}, {text: 'ep90r3'}, {text: 'ep90r7'}, {text: 'ep95r3'}, {text: 'ep95r7'}, {text: 'ep99r3'}, {text: 'ep99r7'}, {text: 'ep999r3'}, {text: 'ep999r7'}, {text: 'first'}, {text: 'last'}, {text: 'median'}, {text: 'mimmin'}, {text: 'mimmax'}, {text: 'min'}, {text: 'max'}, {text: 'mult'}, {text: 'none'}, {text: 'p50'}, {text: 'p75'}, {text: 'p90'}, {text: 'p95'}, {text: 'p99'}, {text: 'p999'}, {text: 'pfsum'}, {text: 'sum'}, {text: 'zimsum'}];
+          _this.scope.fillPolicies = [{text: 'none'}, {text: 'nan'}, {text: 'null'}, {text: 'zero'}];
+          _this.scope.queryFunctions = [
+            {func: 'q', type:'seriesSet', args:{'query': 'string', 'startDuration': 'string', 'endDuration': 'string'}},
+            {func: 'band', type:'seriesSet', args:{'query': 'string', 'duration': 'string', 'period': 'string', 'num': 'scalar'}},
+            {func: 'over', type:'seriesSet', args:{'query': 'string', 'duration': 'string', 'period': 'string', 'num': 'scalar'}},
+            {func: 'shiftBand', type:'seriesSet', args:{'query': 'string', 'duration': 'string', 'period': 'string', 'num': 'scalar'}},
+            {func: 'change', type:'numberSet', args:{'query': 'string', 'startDuration': 'string', 'endDuration': 'string'}},
+            {func: 'count', type:'scalar', args:{'query': 'string', 'startDuration': 'string', 'endDuration': 'string'}},
+            {func: 'window', type:'seriesSet', args:{'query': 'string', 'duration': 'string', 'period': 'string', 'num': 'scalar', 'funcName': 'string'}},
+          ];
           return _this;
         }
 
@@ -161,93 +173,15 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
         }, {
           key: 'addNewVariable',
           value: function addNewVariable() {
-            console.log("Add new variable was called")
-            console.log(this)
-            if(!this.scope.Variables){ this.scope.Variables = ''}
-            //Should be tidied later for security purposes
-            this.scope.Variables = this.sce.trustAsHtml(this.scope.Variables+
-              `
-              <div class="gf-form" style="width:80%;align-items:flex-start;margin-bottom:15px;">
-                <label class="gf-form-label query-keyword">
-                  Variable
-                </label>
-                <input
-                  class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="variable name" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
-                </input>
-                <input class="gf-form-input gf-form-input ng-valid ng-empty ng-dirty ng-valid-parse ng-touched" rows="1" ng-model="ctrl.target.expr" spellcheck='false' placeholder='value'
-                    data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
-                 </input>
-              </div>
-              `)
+            console.log(this.scope)
+            this.scope.queryVariables.push({type: 'variable'});
             this.panelCtrl.refresh(); // Asks the panel to refresh data.
           }
         }, {
           key: 'addNewVariableQ',
           value: function addNewVariableQ() {
-            console.log("Add new variableQ was called")
-            console.log(this)
-            if(!this.scope.Variables){ this.scope.Variables = ''}
-            //Should be tidied later for security purposes
-            this.scope.Variables = this.sce.trustAsHtml(this.scope.Variables+
-              `
-              <div class="gf-form" style="width:80%;align-items:flex-start;">
-                <label class="gf-form-label query-keyword">
-                  Query Variable
-                </label>
-                <input
-                  class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="query variable name" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
-                </input>
-              </div>
-              <div class="gf-form" style="width:80%;align-items:flex-start;">
-                <label class="gf-form-label query-keyword">
-                  Metric
-                </label>
-                <input
-                  class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="query variable name" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
-                </input>
-              </div>
-              <div class="gf-form" style="width:80%;align-items:flex-start;">
-                <label class="gf-form-label query-keyword">
-                  Tags
-                </label>
-                <label class="gf-form-label query-keyword"ng-click="">
-                    +
-                </label>
-              </div>
-              <div class="gf-form" style="width:80%;align-items:flex-start;">
-                <label class="gf-form-label query-keyword">
-                  Agg
-                </label>
-                <input
-                  class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="zimsum(choose)" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
-                </input>
-              </div>
-              <div class="gf-form" style="width:80%;align-items:flex-start;">
-                <label class="gf-form-label query-keyword">
-                  Downsample
-                </label>
-                <input
-                  class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="Choose" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
-                </input>
-                <input
-                  class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="1h" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
-                </input>
-                <input
-                  class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="Choose" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
-                </input>
-              </div>
-              <div class="gf-form" style="width:80%;align-items:flex-start;margin-bottom:15px;">
-                <label class="gf-form-label query-keyword">
-                  Query Args
-                </label>
-                <input
-                  class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="startDuration" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
-                </input>
-                <input
-                  class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="endDuration" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
-                </input>
-              </div>
-              `)
+            console.log(this.scope)
+            this.scope.queryVariables.push({type: 'queryVariable'});
             this.panelCtrl.refresh(); // Asks the panel to refresh data.
           }
         }, {
