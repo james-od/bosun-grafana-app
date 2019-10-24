@@ -78,6 +78,9 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
           _this.metricInfo = _this.metricInfo.bind(_this);
           _this.suggestQuery = _this.suggestQuery.bind(_this);
           _this.suggestTagValues = _this.suggestTagValues.bind(_this);
+          _this.addNewVariable = _this.addNewVariable.bind(_this);
+          _this.addNewVariableQ = _this.addNewVariableQ.bind(_this);
+          _this.getMetricSuggestions = _this.getMetricSuggestions.bind(_this);
           _this.filterTypes = ["Group By", "Filter"];
           _this.scope.queryVariables = [];
           _this.scope.aggOptions = [{text: 'avg'}, {text: 'count'}, {text: 'dev'}, {text: 'diff'}, {text: 'ep50r3'}, {text: 'ep50r7'}, {text: 'ep75r3'}, {text: 'ep75r7'}, {text: 'ep90r3'}, {text: 'ep90r7'}, {text: 'ep95r3'}, {text: 'ep95r7'}, {text: 'ep99r3'}, {text: 'ep99r7'}, {text: 'ep999r3'}, {text: 'ep999r7'}, {text: 'first'}, {text: 'last'}, {text: 'median'}, {text: 'mimmin'}, {text: 'mimmax'}, {text: 'min'}, {text: 'max'}, {text: 'mult'}, {text: 'none'}, {text: 'p50'}, {text: 'p75'}, {text: 'p90'}, {text: 'p95'}, {text: 'p99'}, {text: 'p999'}, {text: 'pfsum'}, {text: 'sum'}, {text: 'zimsum'}];
@@ -91,6 +94,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
             {func: 'count', type:'scalar', args:{'query': 'string', 'startDuration': 'string', 'endDuration': 'string'}},
             {func: 'window', type:'seriesSet', args:{'query': 'string', 'duration': 'string', 'period': 'string', 'num': 'scalar', 'funcName': 'string'}},
           ];
+          _this.scope.suggestions = [];
           return _this;
         }
 
@@ -171,6 +175,26 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
             this.panelCtrl.refresh(); // Asks the panel to refresh data.
           }
         }, {
+          key: 'getMetricSuggestions',
+          value: function getMetricSuggestions(typeahead) {
+            var request = new Request('http://localhost:8010/proxy/suggest?type=metrics&q='.concat(typeahead));
+
+            var the_scope = this.scope
+            var req = fetch(request).then(function(response) {
+              console.log(request)
+              console.log(response)
+              // Convert to JSON
+              return response.json();
+            }).then(function(j) {
+              // Yay, `j` is a JavaScript object
+              the_scope.suggestions = JSON.stringify(j);
+              console.log(JSON.stringify(j));
+            }).catch(function(error) {
+              console.log('Request failed', error)
+            });
+            return req
+          }
+        },{
           key: 'addNewVariable',
           value: function addNewVariable() {
             console.log(this.scope)

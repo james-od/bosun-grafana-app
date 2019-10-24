@@ -26,7 +26,7 @@
                     Query Variable
                   </label>
                   <input
-                    class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="query variable name" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                    class="gf-form-input" rows="1" spellcheck="false" placeholder="query variable name" data-min-length=0 data-items=150 >
                   </input>
                 </div>
                 <div class="gf-form" style="width:80%;align-items:flex-start;">
@@ -39,12 +39,15 @@
 
                 </div>
                 <div class="gf-form" style="width:80%;align-items:flex-start;">
+<!--                  getMetricSuggestions-->
                   <label class="gf-form-label query-keyword">
                     Metric
                   </label>
                   <input
-                    class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="query variable name" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                    class="gf-form-input" rows="1" ng-model="typeahead" onspellcheck="false" placeholder="query variable name" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.getMetricSuggestions(typeahead)">
                   </input>
+                  <label class="gf-form-label query-keyword"
+                  >{{suggestions}}</label>
                 </div>
                 <div class="gf-form" style="width:80%;align-items:flex-start;">
                   <label class="gf-form-label query-keyword">
@@ -70,7 +73,7 @@
                     <option ng-repeat="aggOption in aggOptions">{{aggOption.text}}</option>
                   </select>
                   <input
-                    class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="1h" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                    class="gf-form-input" rows="1" spellcheck="false" placeholder="1h" data-min-length=0 data-items=150>
                   </input>
                   <select class="gf-form-input">
                     <option ng-repeat="fillPolicy in fillPolicies">{{fillPolicy.text}}</option>
@@ -80,24 +83,24 @@
                   <label class="gf-form-label query-keyword">
                     Query Args
                   </label>
-                  
+
                   <input
-                    ng-if="queryfunc=='q' || queryfunc=='change' || queryfunc=='count'" class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="startDuration" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                    ng-if="queryfunc=='q' || queryfunc=='change' || queryfunc=='count'" class="gf-form-input" rows="1" spellcheck="false" placeholder="startDuration" data-min-length=0 data-items=150>
                   </input>
                   <input
-                    ng-if="queryfunc=='q' || queryfunc=='change' || queryfunc=='count'" class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="endDuration" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                    ng-if="queryfunc=='q' || queryfunc=='change' || queryfunc=='count'" class="gf-form-input" rows="1" spellcheck="false" placeholder="endDuration" data-min-length=0 data-items=150>
                   </input>
                   <input
-                    ng-if="queryfunc=='band' || queryfunc=='over' || queryfunc=='shiftBand' || queryfunc=='window'" class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="duration" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                    ng-if="queryfunc=='band' || queryfunc=='over' || queryfunc=='shiftBand' || queryfunc=='window'" class="gf-form-input" rows="1" spellcheck="false" placeholder="duration" data-min-length=0 data-items=150>
                   </input>
                   <input
-                    ng-if="queryfunc=='band' || queryfunc=='over' || queryfunc=='shiftBand' || queryfunc=='window'" class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="period" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                    ng-if="queryfunc=='band' || queryfunc=='over' || queryfunc=='shiftBand' || queryfunc=='window'" class="gf-form-input" rows="1" spellcheck="false" placeholder="period" data-min-length=0 data-items=150>
                   </input>
                   <input
-                    ng-if="queryfunc=='band' || queryfunc=='over' || queryfunc=='shiftBand' || queryfunc=='window'" class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="num" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                    ng-if="queryfunc=='band' || queryfunc=='over' || queryfunc=='shiftBand' || queryfunc=='window'" class="gf-form-input" rows="1" spellcheck="false" placeholder="num" data-min-length=0 data-items=150>
                   </input>
                   <input
-                    ng-if="queryfunc=='window'" class="gf-form-input" rows="1" ng-model="ctrl.target.expr" spellcheck="false" placeholder="funcName" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.onChangeInternal()">
+                    ng-if="queryfunc=='window'" class="gf-form-input" rows="1" spellcheck="false" placeholder="funcName" data-min-length=0 data-items=150>
                   </input>
                 </div>
                 <div ng-model="elem$index" />
