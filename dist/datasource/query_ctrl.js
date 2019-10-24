@@ -78,11 +78,13 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
           _this.metricInfo = _this.metricInfo.bind(_this);
           _this.suggestQuery = _this.suggestQuery.bind(_this);
           _this.suggestTagValues = _this.suggestTagValues.bind(_this);
+          _this.getSubstitutedFinalQuery = _this.getSubstitutedFinalQuery.bind(_this);
           _this.addNewVariable = _this.addNewVariable.bind(_this);
           _this.addNewVariableQ = _this.addNewVariableQ.bind(_this);
           _this.getMetricSuggestions = _this.getMetricSuggestions.bind(_this);
+          _this.buildQueryVariable = _this.buildQueryVariable.bind(_this);
           _this.filterTypes = ["Group By", "Filter"];
-          _this.scope.queryVariables = [];
+          _this.scope.variables = {};
           _this.scope.aggOptions = [{text: 'avg'}, {text: 'count'}, {text: 'dev'}, {text: 'diff'}, {text: 'ep50r3'}, {text: 'ep50r7'}, {text: 'ep75r3'}, {text: 'ep75r7'}, {text: 'ep90r3'}, {text: 'ep90r7'}, {text: 'ep95r3'}, {text: 'ep95r7'}, {text: 'ep99r3'}, {text: 'ep99r7'}, {text: 'ep999r3'}, {text: 'ep999r7'}, {text: 'first'}, {text: 'last'}, {text: 'median'}, {text: 'mimmin'}, {text: 'mimmax'}, {text: 'min'}, {text: 'max'}, {text: 'mult'}, {text: 'none'}, {text: 'p50'}, {text: 'p75'}, {text: 'p90'}, {text: 'p95'}, {text: 'p99'}, {text: 'p999'}, {text: 'pfsum'}, {text: 'sum'}, {text: 'zimsum'}];
           _this.scope.fillPolicies = [{text: 'none'}, {text: 'nan'}, {text: 'null'}, {text: 'zero'}];
           _this.scope.queryFunctions = [
@@ -95,6 +97,8 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
             {func: 'window', type:'seriesSet', args:{'query': 'string', 'duration': 'string', 'period': 'string', 'num': 'scalar', 'funcName': 'string'}},
           ];
           _this.scope.suggestions = [];
+          _this.scope.varCounter = 0;
+          _this.scope.finalQuery = "";
           return _this;
         }
 
@@ -194,18 +198,199 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
             });
             return req
           }
-        },{
+        }, {
+          key: 'getSubstitutedFinalQuery',
+          value: function getSubstitutedFinalQuery(finalQuery) {
+            //Dictionary doesn't guarantee ordering, so convert to array and sort by key
+            var values = new Array();
+            for (var id in this.scope.variables) {
+              values.push(this.scope.variables[id]);
+            }
+            values.sort()
+            values = values.reverse()
+
+            console.log("value are")
+            console.log(values)
+
+            var the_scope = this
+
+            var substitutedFinalQuery = finalQuery
+            values.forEach(function(value) {
+              console.log("for value: ")
+              console.log(value)
+              if(value.type == "variable") {
+                console.log("type is variable")
+
+                if (value["name"] && value["name"].startsWith("$")) {
+                  if (value["value"] == undefined) {
+                    substitutedFinalQuery = substitutedFinalQuery.split(value["name"]).join("");
+                  } else {
+                    substitutedFinalQuery = substitutedFinalQuery.split(value["name"]).join(value["value"]);
+                  }
+                }
+                console.log(substitutedFinalQuery)
+              }
+              if(value.type == "queryVariable") {
+                console.log("type is query")
+                console.log(value.value)
+                console.log(the_scope.buildQueryVariable(value))
+                substitutedFinalQuery = substitutedFinalQuery.split(value.value["queryVariableName"]).join(the_scope.buildQueryVariable(value));
+                console.log(substitutedFinalQuery)
+              }
+            });
+            return substitutedFinalQuery;
+          }
+        }, {
+          key: 'updateFinalQuery',
+          value: function updateFinalQuery(finalQuery) {
+            this.scope.finalQuery = finalQuery;
+            console.log(this.getSubstitutedFinalQuery(finalQuery))
+            this.panelCtrl.refresh(); // Asks the panel to refresh data.
+          }
+        }, {
+          key: 'addVariableValue',
+          value: function addVariableValue(inputValue, id) {
+            console.log(this.scope.variables[id])
+            if(this.scope.variables[id]){
+              this.scope.variables[id]["value"] = inputValue;
+            }else{
+              console.log("Oh no, id doesn't exist")
+            }
+            console.log(this.scope.variables)
+            this.panelCtrl.refresh(); // Asks the panel to refresh data.
+          }
+        }, {
+          key: 'buildQueryVariable',
+          value: function buildQueryVariable(parameterObject) {
+
+            // [query function]("[agg]:[downsample_time]-[downsample_agg]-[fill_policy]:[conversion flag e.g rate]:[metric]{}{[tag=value for every desired tag]}", "[each query param]")
+
+            var params = parameterObject.value
+            var constructedQuery = ""
+            if(!params){
+              return ""
+            }
+            if(params["queryFunction"]){
+              constructedQuery = constructedQuery + params["queryFunction"] + '("'
+            }else{
+              console.log("Missing query function")
+              return ""
+            }
+            if(params["queryAgg"]){
+              constructedQuery = constructedQuery + params["queryAgg"] + ":"
+            }else{
+              console.log("Missing query aggregator")
+              return ""
+            }
+            if(params["downsampleTime"]){
+              constructedQuery = constructedQuery + params["downsampleTime"]
+              if(params["downsampleAgg"]){
+                constructedQuery = constructedQuery + "-" + params["downsampleAgg"]
+              }else{
+                console.log("Missing downsample agg")
+              }
+              if(params["fillPolicy"]){
+                constructedQuery = constructedQuery + "-" + params["fillPolicy"]
+              }else{
+                console.log("Missing fillPolicy")
+              }
+            }else{
+              console.log("Missing downsample time")
+            }
+            if(params["conversionFlag"]){
+              constructedQuery = constructedQuery + ":" + params["conversionFlag"]
+            }else{
+              console.log("Missing conversionFlag")
+            }
+            if(params["metric"]){
+              constructedQuery = constructedQuery + ":" + params["metric"] + "{"
+            }else{
+              console.log("Missing metric")
+              return ""
+            }
+            if(params["metricTags"]){
+              constructedQuery = constructedQuery + params["metricTags"] + "}"
+            }else{
+              console.log("Missing metric tags")
+              constructedQuery = constructedQuery + "}"
+            }
+            if(params["tagsAndValues"]){
+              constructedQuery = constructedQuery + "{" + params["tagsAndValues"] + '}"'
+            }else{
+              console.log("Missing tags")
+              constructedQuery = constructedQuery + '{}"'
+            }
+            if(params["startDuration"]){
+              constructedQuery = constructedQuery + ', "' + params["startDuration"] + '"'
+            }
+            if(params["endDuration"]){
+              constructedQuery = constructedQuery + ', "' + params["endDuration"] + '"'
+            }
+            if(params["duration"]){
+              constructedQuery = constructedQuery + ', "' + params["duration"] + '"'
+            }
+            if(params["period"]){
+              constructedQuery = constructedQuery + ', "' + params["period"] + '"'
+            }
+            if(params["num"]){
+              constructedQuery = constructedQuery + ', "' + params["num"] + '"'
+            }
+            if(params["funcName"]){
+              constructedQuery = constructedQuery + ', "' + params["funcName"] + '"'
+            }
+            constructedQuery = constructedQuery + ")"
+            console.log("COntstructed query is:")
+            console.log(constructedQuery)
+            this.panelCtrl.refresh(); // Asks the panel to refresh data.
+            return constructedQuery;
+          }
+        }, {
+          key: 'addQueryVariableParameter',
+          value: function addQueryVariableParameter(inputType, inputValue, id) {
+            console.log("addQueryVariableParameter")
+            if(this.scope.variables[id]){
+              if(!this.scope.variables[id]["value"]){
+                this.scope.variables[id]["value"] = {}
+              }
+              this.scope.variables[id]["value"][inputType] = inputValue;
+            }else{
+              console.log("Oh no, id doesn't exist")
+            }
+            console.log(this.scope.variables)
+            this.panelCtrl.refresh(); // Asks the panel to refresh data.
+          }
+        }, {
+          key: 'addVariableName',
+          value: function addVariableName(inputName, id) {
+            console.log(this.scope.variables[id])
+            if(this.scope.variables[id]){
+              this.scope.variables[id]["name"] = inputName;
+            }else{
+              console.log("Oh no, id doesn't exist")
+            }
+            console.log(this.scope.variables)
+            this.panelCtrl.refresh(); // Asks the panel to refresh data.
+          }
+        }, {
           key: 'addNewVariable',
           value: function addNewVariable() {
             console.log(this.scope)
-            this.scope.queryVariables.push({type: 'variable'});
+            this.scope.variables[this.scope.varCounter] = {type: 'variable'};
+            this.scope.varCounter += 1;
             this.panelCtrl.refresh(); // Asks the panel to refresh data.
           }
         }, {
           key: 'addNewVariableQ',
           value: function addNewVariableQ() {
             console.log(this.scope)
-            this.scope.queryVariables.push({type: 'queryVariable'});
+            this.scope.variables[this.scope.varCounter] = {type: 'queryVariable'};
+            this.scope.varCounter += 1;
+            this.panelCtrl.refresh(); // Asks the panel to refresh data.
+          }
+        }, {
+          key: 'substituteVariables',
+          value: function substituteVariables(finalQuery) {
+            console.log(this.variables)
             this.panelCtrl.refresh(); // Asks the panel to refresh data.
           }
         }, {
