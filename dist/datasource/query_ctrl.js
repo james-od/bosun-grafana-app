@@ -190,12 +190,11 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
               // Convert to JSON
               return response.json();
             }).then(function(j) {
-              // Yay, `j` is a JavaScript object
-              the_scope.suggestions = JSON.stringify(j);
-              console.log(JSON.stringify(j));
+              the_scope.suggestions = j;
             }).catch(function(error) {
               console.log('Request failed', error)
             });
+            this.panelCtrl.refresh(); // Asks the panel to refresh data
             return req
           }
         }, {
