@@ -44,7 +44,7 @@
                     Metric
                   </label>
                   <input list="responseSuggestions"
-                    class="gf-form-input" rows="1" ng-model="typeahead" onspellcheck="false" placeholder="query variable name" data-min-length=0 data-items=150 ng-change="ctrl.getMetricSuggestions(typeahead)">
+                    class="gf-form-input" rows="1" ng-model="typeahead" onspellcheck="false" placeholder="query variable name" data-min-length=0 data-items=150 ng-change="ctrl.getMetricSuggestions(typeahead); ctrl.addQueryVariableParameter('metric', typeahead, id)">
                   </input>
                   <datalist id="responseSuggestions">
                     <option ng-repeat="suggestion in suggestions track by $index">{{suggestion}}</option>
@@ -54,8 +54,14 @@
                   <label class="gf-form-label query-keyword">
                     Tags
                   </label>
-                  <label class="gf-form-label query-keyword"ng-click="ctrl.addNewVariableQ()">
+                  <label class="gf-form-label query-keyword"ng-click="ctrl.addTagBox(id)">
                     +
+                  </label>
+
+                  <label
+                    class="gf-form-label" style="overflow: hidden; height: 85px" ng-repeat="(tagId, name) in tagBoxes[id]">
+                    <input class="gf-form-input" style="float:left" ng-model="tagInputKey" ng-change="ctrl.editTagBox(id, tagId, tagInputKey, 'key')" rows="1" spellcheck="false" placeholder="enter tag key" data-min-length=0 data-items=150>
+                    <input class="gf-form-input" style="float: left" ng-model="tagInputValue" ng-change="ctrl.editTagBox(id, tagId, tagInputValue, 'value')" rows="1" spellcheck="false" placeholder="enter tag value" data-min-length=0 data-items=150>
                   </label>
                 </div>
                 <div class="gf-form" style="width:80%;align-items:flex-start;" ng-query-ctrl="ctrl">
