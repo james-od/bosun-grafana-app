@@ -178,7 +178,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
         }, {
           key: 'onChangeInternal',
           value: function onChangeInternal() {
-            this.panelCtrl.refresh(); // Asks the panel to refresh data.
+            this.panelCtrl.refresh();
           }
         }, {
           key: 'getMetricSuggestions',
@@ -187,16 +187,13 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
 
             var the_scope = this.scope
             var req = fetch(request).then(function(response) {
-              console.log(request)
-              console.log(response)
-              // Convert to JSON
               return response.json();
-            }).then(function(j) {
-              the_scope.suggestions = j;
+            }).then(function(responseSuggestions) {
+              the_scope.suggestions = responseSuggestions;
             }).catch(function(error) {
-              console.log('Request failed', error)
+              throw error;
             });
-            this.panelCtrl.refresh(); // Asks the panel to refresh data
+            this.panelCtrl.refresh();
             return req
           }
         }, {
@@ -236,7 +233,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
           value: function updateFinalQuery(finalQuery) {
             this.scope.finalQuery = finalQuery;
             console.log(this.getSubstitutedFinalQuery(finalQuery))
-            this.panelCtrl.refresh(); // Asks the panel to refresh data.
+            this.panelCtrl.refresh();
           }
         }, {
           key: 'addVariableValue',
@@ -244,9 +241,9 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
             if(this.scope.variables[id]){
               this.scope.variables[id]["value"] = inputValue;
             }else{
-              console.log("Oh no, id doesn't exist")
+              throw new ReferenceError("When trying to add value the requested variable id could not be found")
             }
-            this.panelCtrl.refresh(); // Asks the panel to refresh data.
+            this.panelCtrl.refresh();
           }
         }, {
           key: 'buildQueryVariable',
@@ -255,55 +252,42 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
             // [query function]("[agg]:[downsample_time]-[downsample_agg]-[fill_policy]:[conversion flag e.g rate]:[metric]{}{[tag=value for every desired tag]}", "[each query param]")
 
             var $scope = this.scope;
-            var params = parameterObject.value
-            var constructedQuery = ""
+            var params = parameterObject.value;
+            var constructedQuery = "";
             if(!params){
-              return ""
+              throw new ReferenceError("No query parameters found")
             }
             if(params["queryFunction"]){
               constructedQuery = constructedQuery + params["queryFunction"] + '("'
             }else{
-              console.log("Missing query function")
-              return ""
+              throw new ReferenceError("Query function not set")
             }
             if(params["queryAgg"]){
               constructedQuery = constructedQuery + params["queryAgg"] + ":"
             }else{
-              console.log("Missing query aggregator")
-              return ""
+              throw new ReferenceError("Query aggregator not set")
             }
             if(params["downsampleTime"]){
               constructedQuery = constructedQuery + params["downsampleTime"]
               if(params["downsampleAgg"]){
                 constructedQuery = constructedQuery + "-" + params["downsampleAgg"]
-              }else{
-                console.log("Missing downsample agg")
               }
               if(params["fillPolicy"]){
                 constructedQuery = constructedQuery + "-" + params["fillPolicy"]
-              }else{
-                console.log("Missing fillPolicy")
               }
-            }else{
-              console.log("Missing downsample time")
             }
             if(params["conversionFlag"]){
               constructedQuery = constructedQuery + ":" + params["conversionFlag"]
-            }else{
-              console.log("Missing conversionFlag")
             }
             if(params["metric"]){
               constructedQuery = constructedQuery + ":" + params["metric"] + "{"
             }else{
-              console.log("Missing metric")
-              return ""
+              throw new ReferenceError("Query metric not set")
             }
             if(params["metricTags"]){
-              constructedQuery = constructedQuery + params["metricTags"] + "}"
-            }else{
-              console.log("Missing metric tags")
-              constructedQuery = constructedQuery + "}"
+              constructedQuery = constructedQuery + params["metricTags"]
             }
+            constructedQuery = constructedQuery + "}"
             if($scope.tagBoxes[id]){
               var onFirstTag = true
 
@@ -318,7 +302,6 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
               }
               constructedQuery = constructedQuery + '}"'
             }else{
-              console.log("Missing tags")
               constructedQuery = constructedQuery + '{}"'
             }
             if(params["startDuration"]){
@@ -340,7 +323,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
               constructedQuery = constructedQuery + ', "' + params["funcName"] + '"'
             }
             constructedQuery = constructedQuery + ")"
-            this.panelCtrl.refresh(); // Asks the panel to refresh data.
+            this.panelCtrl.refresh();
             console.log(constructedQuery)
             return constructedQuery;
           }
@@ -353,9 +336,9 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
               }
               this.scope.variables[id]["value"][inputType] = inputValue;
             }else{
-              console.log("Oh no, id doesn't exist")
+              throw new ReferenceError("Requested queryVariable id could not be found")
             }
-            this.panelCtrl.refresh(); // Asks the panel to refresh data.
+            this.panelCtrl.refresh();
           }
         }, {
           key: 'addVariableName',
@@ -363,16 +346,16 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
             if(this.scope.variables[id]){
               this.scope.variables[id]["name"] = inputName;
             }else{
-              console.log("Oh no, id doesn't exist")
+              throw new ReferenceError("When trying to add name the requested variable id could not be found")
             }
-            this.panelCtrl.refresh(); // Asks the panel to refresh data.
+            this.panelCtrl.refresh();
           }
         }, {
           key: 'addNewVariable',
           value: function addNewVariable() {
             this.scope.variables[this.scope.varCounter] = {type: 'variable'};
             this.scope.varCounter += 1;
-            this.panelCtrl.refresh(); // Asks the panel to refresh data.
+            this.panelCtrl.refresh();
           }
         }, {
           key: 'addNewVariableQ',
@@ -380,18 +363,19 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
             console.log(this.scope)
             this.scope.variables[this.scope.varCounter] = {type: 'queryVariable'};
             this.scope.varCounter += 1;
-            this.panelCtrl.refresh(); // Asks the panel to refresh data.
+            this.panelCtrl.refresh();
           }
         }, {
           key: 'substituteVariables',
           value: function substituteVariables(finalQuery) {
-            this.panelCtrl.refresh(); // Asks the panel to refresh data.
+            //TODO
+            this.panelCtrl.refresh();
           }
         }, {
           key: 'editTagBox',
           value: function editTagBox(queryId, tagId, input, type) {
             this.scope.tagBoxes[parseInt(queryId)][parseInt(tagId)][type] = input;
-            this.panelCtrl.refresh(); // Asks the panel to refresh data.
+            this.panelCtrl.refresh();
           }
         }, {
           key: 'addTagBox',
@@ -401,7 +385,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
             }
             this.scope.tagBoxes[queryId][this.scope.tagBoxCounter] = {key: "", value: ""};
             this.scope.tagBoxCounter += 1;
-            this.panelCtrl.refresh(); // Asks the panel to refresh data.
+            this.panelCtrl.refresh();
           }
         }, {
           key: 'addSuggest',
