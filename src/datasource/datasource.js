@@ -4,6 +4,7 @@ import moment from 'moment';
 export class BosunDatasource {
     constructor(instanceSettings, $q, backendSrv, templateSrv, $sce, $rootScope) {
         this.annotateUrl = instanceSettings.jsonData.annotateUrl;
+        this.openTSDBUrl  = instanceSettings.jsonData.openTSDBUrl;
         this.type = instanceSettings.type;
         this.url = instanceSettings.url;
         this.name = instanceSettings.name;
@@ -310,7 +311,7 @@ export class BosunDatasource {
         });
     }
 
-    // Since the API response is not JSON, we need a transform interceptor to 
+    // Since the API response is not JSON, we need a transform interceptor to
     // handle a text response. Otherwise we just get i.e. 'Internal Server Error'
     _plainTextResponseTransform(data, headers) {
         if (headers("content-type").includes("text/plain")) {

@@ -65,9 +65,8 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
           _classCallCheck(this, BosunDatasourceQueryCtrl);
 
           var _this = _possibleConstructorReturn(this, (BosunDatasourceQueryCtrl.__proto__ || Object.getPrototypeOf(BosunDatasourceQueryCtrl)).call(this, $scope, $injector, $sce));
-
           _this.scope = $scope;
-          _this.sce = $sce
+          _this.sce = $sce;
           _this.queryHelper = {};
           _this.uiSegmentSrv = uiSegmentSrv;
           _this.target.expandHelper = 0;
@@ -183,7 +182,10 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
         }, {
           key: 'getMetricSuggestions',
           value: function getMetricSuggestions(typeahead) {
-            var request = new Request('http://localhost:8010/proxy/suggest?type=metrics&q='.concat(typeahead));
+            if(!this.datasource.openTSDBUrl){
+              throw ReferenceError("Missing OpenTSDB URL")
+            }
+            var request = new Request(this.datasource.openTSDBUrl + "/suggest?type=metrics&q=" + typeahead);
 
             var the_scope = this.scope
             var req = fetch(request).then(function(response) {
@@ -249,8 +251,6 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
           key: 'buildQueryVariable',
           value: function buildQueryVariable(parameterObject, id) {
 
-            // [query function]("[agg]:[downsample_time]-[downsample_agg]-[fill_policy]:[conversion flag e.g rate]:[metric]{}{[tag=value for every desired tag]}", "[each query param]")
-
             var $scope = this.scope;
             var params = parameterObject.value;
             var constructedQuery = "";
@@ -258,73 +258,73 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
               throw new ReferenceError("No query parameters found")
             }
             if(params["queryFunction"]){
-              constructedQuery = constructedQuery + params["queryFunction"] + '("'
+              constructedQuery += params["queryFunction"] + '("'
             }else{
               throw new ReferenceError("Query function not set")
             }
             if(params["queryAgg"]){
-              constructedQuery = constructedQuery + params["queryAgg"] + ":"
+              constructedQuery += params["queryAgg"] + ":"
             }else{
               throw new ReferenceError("Query aggregator not set")
             }
             if(params["downsampleTime"]){
-              constructedQuery = constructedQuery + params["downsampleTime"]
+              constructedQuery += params["downsampleTime"]
               if(params["downsampleAgg"]){
-                constructedQuery = constructedQuery + "-" + params["downsampleAgg"]
+                constructedQuery += "-" + params["downsampleAgg"]
               }
               if(params["fillPolicy"]){
-                constructedQuery = constructedQuery + "-" + params["fillPolicy"]
+                constructedQuery += "-" + params["fillPolicy"]
               }
             }
             if(params["conversionFlag"]){
-              constructedQuery = constructedQuery + ":" + params["conversionFlag"]
+              constructedQuery += ":" + params["conversionFlag"]
             }
             if(params["metric"]){
-              constructedQuery = constructedQuery + ":" + params["metric"] + "{"
+              constructedQuery += ":" + params["metric"] + "{"
             }else{
               throw new ReferenceError("Query metric not set")
             }
             if(params["metricTags"]){
-              constructedQuery = constructedQuery + params["metricTags"]
+              constructedQuery += params["metricTags"]
             }
-            constructedQuery = constructedQuery + "}"
+            constructedQuery += "}"
             if($scope.tagBoxes[id]){
               var onFirstTag = true
 
-              constructedQuery = constructedQuery + "{"
+              constructedQuery += "{"
               for (var tagMapping in $scope.tagBoxes[id]) {
                 if ($scope.tagBoxes[id].hasOwnProperty(tagMapping)) {
                   if(!onFirstTag){
-                    constructedQuery = constructedQuery + ", "
+                    constructedQuery += ", "
                   }else{onFirstTag = false;}
-                  constructedQuery = constructedQuery + $scope.tagBoxes[id][tagMapping]["key"] + "=" + $scope.tagBoxes[id][tagMapping]["value"]
+                  constructedQuery += $scope.tagBoxes[id][tagMapping]["key"] + "=" + $scope.tagBoxes[id][tagMapping]["value"]
                 }
               }
-              constructedQuery = constructedQuery + '}"'
+              constructedQuery += '}"'
             }else{
-              constructedQuery = constructedQuery + '{}"'
+              constructedQuery += '{}"'
             }
             if(params["startDuration"]){
-              constructedQuery = constructedQuery + ', "' + params["startDuration"] + '"'
+              constructedQuery += ', "' + params["startDuration"] + '"'
             }
             if(params["endDuration"]){
-              constructedQuery = constructedQuery + ', "' + params["endDuration"] + '"'
+              constructedQuery += ', "' + params["endDuration"] + '"'
             }
             if(params["duration"]){
-              constructedQuery = constructedQuery + ', "' + params["duration"] + '"'
+              constructedQuery += ', "' + params["duration"] + '"'
             }
             if(params["period"]){
-              constructedQuery = constructedQuery + ', "' + params["period"] + '"'
+              constructedQuery += ', "' + params["period"] + '"'
             }
             if(params["num"]){
-              constructedQuery = constructedQuery + ', "' + params["num"] + '"'
+              constructedQuery += ', "' + params["num"] + '"'
             }
             if(params["funcName"]){
-              constructedQuery = constructedQuery + ', "' + params["funcName"] + '"'
+              constructedQuery += ', "' + params["funcName"] + '"'
             }
-            constructedQuery = constructedQuery + ")"
+            constructedQuery += ")";
             this.panelCtrl.refresh();
-            console.log(constructedQuery)
+            console.log(constructedQuery);
             return constructedQuery;
           }
         }, {

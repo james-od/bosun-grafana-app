@@ -41,6 +41,7 @@ System.register(['app/core/table_model', 'moment'], function (_export, _context)
                     _classCallCheck(this, BosunDatasource);
 
                     this.annotateUrl = instanceSettings.jsonData.annotateUrl;
+                    this.openTSDBUrl = instanceSettings.jsonData.openTSDBUrl;
                     this.type = instanceSettings.type;
                     this.url = instanceSettings.url;
                     this.name = instanceSettings.name;
