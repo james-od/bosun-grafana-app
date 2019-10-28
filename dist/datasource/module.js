@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-System.register(['./datasource', './query_ctrl'], function (_export, _context) {
+System.register(["./datasource", "./query_ctrl"], function (_export, _context) {
   "use strict";
 
   var BosunDatasource, BosunDatasourceQueryCtrl, BosunConfigCtrl, BosunQueryOptionsCtrl, BosunAnnotationsQueryCtrl;
@@ -18,19 +18,19 @@ System.register(['./datasource', './query_ctrl'], function (_export, _context) {
       BosunDatasourceQueryCtrl = _query_ctrl.BosunDatasourceQueryCtrl;
     }],
     execute: function () {
-      _export('ConfigCtrl', BosunConfigCtrl = function BosunConfigCtrl() {
+      _export("ConfigCtrl", BosunConfigCtrl = function BosunConfigCtrl() {
         _classCallCheck(this, BosunConfigCtrl);
       });
 
       BosunConfigCtrl.templateUrl = 'datasource/partials/config.html';
 
-      _export('QueryOptionsCtrl', BosunQueryOptionsCtrl = function BosunQueryOptionsCtrl() {
+      _export("QueryOptionsCtrl", BosunQueryOptionsCtrl = function BosunQueryOptionsCtrl() {
         _classCallCheck(this, BosunQueryOptionsCtrl);
       });
 
       BosunQueryOptionsCtrl.templateUrl = 'datasource/partials/query.options.html';
 
-      _export('AnnotationsQueryCtrl', BosunAnnotationsQueryCtrl = function BosunAnnotationsQueryCtrl() {
+      _export("AnnotationsQueryCtrl", BosunAnnotationsQueryCtrl = function BosunAnnotationsQueryCtrl() {
         _classCallCheck(this, BosunAnnotationsQueryCtrl);
 
         this.showHelp = 0;
@@ -38,15 +38,15 @@ System.register(['./datasource', './query_ctrl'], function (_export, _context) {
 
       BosunAnnotationsQueryCtrl.templateUrl = 'datasource/partials/annotations.editor.html';
 
-      _export('Datasource', BosunDatasource);
+      _export("Datasource", BosunDatasource);
 
-      _export('QueryCtrl', BosunDatasourceQueryCtrl);
+      _export("QueryCtrl", BosunDatasourceQueryCtrl);
 
-      _export('ConfigCtrl', BosunConfigCtrl);
+      _export("ConfigCtrl", BosunConfigCtrl);
 
-      _export('QueryOptionsCtrl', BosunQueryOptionsCtrl);
+      _export("QueryOptionsCtrl", BosunQueryOptionsCtrl);
 
-      _export('AnnotationsQueryCtrl', BosunAnnotationsQueryCtrl);
+      _export("AnnotationsQueryCtrl", BosunAnnotationsQueryCtrl);
     }
   };
 });

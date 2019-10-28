@@ -72,6 +72,8 @@ Bosun also needs a ElasticSearch backend in order for its annotations subsystem 
 ## Local Development
 
 Clone this repo into plugins folder.
+`npm install -g grunt-cli`
+
 Add the following to datasources.yml to provide grafana with a suitable mock datasource:
 ```
   - name: gdev-bosun

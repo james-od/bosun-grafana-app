@@ -1,210 +1,218 @@
 <query-editor-row query-ctrl="ctrl">
 
-          <div ng-repeat="(id, variable) in variables">
+  <script></script>
 
-            <div ng-if="variable.type == 'variable'">
+  <ul id="items">
+    <li>item 1</li>
+    <li>item 2</li>
+    <li>item 3</li>
+  </ul>
 
-              <div class="gf-form" style="width:80%;align-items:flex-start;margin-bottom:15px;">
-                <label class="gf-form-label query-keyword">
-                  Variable
-                </label>
-                <input
-                  class="gf-form-input" rows="1" ng-model="inputName" spellcheck="false" placeholder="variable name" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.addVariableName(inputName, id)">
-                </input>
-                <input
-                  class="gf-form-input" rows="1" ng-model="inputValue" spellcheck='false' placeholder='value' data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.addVariableValue(inputValue, id)">
-                </input>
-              </div>
+  <div ng-repeat="(id, variable) in variables">
 
-            </div>
+    <div ng-if="variable.type == 'variable'">
 
-            <div ng-if="variable.type == 'queryVariable'">
-              <div id="query-variable-{{$index}}" class="gf-form-inline" style="align-items:flex-start; margin-bottom: 15px">
-
-                <div class="gf-form" style="width:80%;align-items:flex-start;">
-                  <label class="gf-form-label query-keyword">
-                    Query Variable
-                  </label>
-                  <input
-                    class="gf-form-input" rows="1" ng-model="inputValue" spellcheck="false" placeholder="query variable name" data-min-length=0 data-items=150 ng-change="ctrl.addQueryVariableParameter('queryVariableName', inputValue, id)">
-                  </input>
-                </div>
-                <div class="gf-form" style="width:80%;align-items:flex-start;">
-                  <label class="gf-form-label query-keyword">
-                    Query Function
-                  </label>
-                  <select ng-model="queryfunc" class="gf-form-input" ng-change="ctrl.addQueryVariableParameter('queryFunction', queryfunc, id)">
-                    <option ng-repeat="queryFunction in queryFunctions">{{queryFunction.func}}</option>
-                  </select>
-
-                </div>
-                <div class="gf-form" style="width:80%;align-items:flex-start;">
-<!--                  getMetricSuggestions-->
-                  <label class="gf-form-label query-keyword">
-                    Metric
-                  </label>
-                  <input list="responseSuggestions"
-                    class="gf-form-input" rows="1" ng-model="typeahead" onspellcheck="false" placeholder="query variable name" data-min-length=0 data-items=150 ng-change="ctrl.getMetricSuggestions(typeahead); ctrl.addQueryVariableParameter('metric', typeahead, id)">
-                  </input>
-                  <datalist id="responseSuggestions">
-                    <option ng-repeat="suggestion in suggestions track by $index">{{suggestion}}</option>
-                  </datalist>
-                </div>
-                <div class="gf-form" style="width:80%;align-items:flex-start;">
-                  <label class="gf-form-label query-keyword">
-                    Tags
-                  </label>
-                  <label class="gf-form-label query-keyword"ng-click="ctrl.addTagBox(id)">
-                    +
-                  </label>
-
-                  <label
-                    class="gf-form-label" style="overflow: hidden; height: 85px" ng-repeat="(tagId, name) in tagBoxes[id]">
-                    <input class="gf-form-input" style="float:left" ng-model="tagInputKey" ng-change="ctrl.editTagBox(id, tagId, tagInputKey, 'key')" rows="1" spellcheck="false" placeholder="enter tag key" data-min-length=0 data-items=150>
-                    <input class="gf-form-input" style="float: left" ng-model="tagInputValue" ng-change="ctrl.editTagBox(id, tagId, tagInputValue, 'value')" rows="1" spellcheck="false" placeholder="enter tag value" data-min-length=0 data-items=150>
-                  </label>
-                </div>
-                <div class="gf-form" style="width:80%;align-items:flex-start;" ng-query-ctrl="ctrl">
-                  <label class="gf-form-label query-keyword">
-                    Agg
-                  </label>
-                  <select class="gf-form-input" ng-model="agg" ng-change="ctrl.addQueryVariableParameter('queryAgg', agg, id)">
-                    <option ng-repeat="aggOption in aggOptions">{{aggOption.text}}</option>
-                  </select>
-                </div>
-                <div class="gf-form" style="width:80%;align-items:flex-start;">
-                  <label class="gf-form-label query-keyword">
-                    Downsample
-                  </label>
-                  <input
-                    class="gf-form-input" ng-model="downsampleTime" ng-change="ctrl.addQueryVariableParameter('downsampleTime', downsampleTime, id)" rows="1" spellcheck="false" placeholder="1h" data-min-length=0 data-items=150>
-                  </input>
-                  <select class="gf-form-input" ng-model="downsampleAgg" ng-change="ctrl.addQueryVariableParameter('downsampleAgg', downsampleAgg, id)">
-                    <option ng-repeat="aggOption in aggOptions">{{aggOption.text}}</option>
-                  </select>
-                  <select class="gf-form-input" ng-model="fillPolicy" ng-change="ctrl.addQueryVariableParameter('fillPolicy', fillPolicy, id)">
-                    <option ng-repeat="fillPolicy in fillPolicies">{{fillPolicy.text}}</option>
-                  </select>
-                </div>
-                <div class="gf-form" style="width:80%;align-items:flex-start;margin-bottom:15px;">
-                  <label class="gf-form-label query-keyword">
-                    Query Args
-                  </label>
-
-                  <input
-                    ng-if="queryfunc=='q' || queryfunc=='change' || queryfunc=='count'" ng-model="startDuration" ng-change="ctrl.addQueryVariableParameter('startDuration', startDuration, id)" class="gf-form-input" rows="1" spellcheck="false" placeholder="startDuration" data-min-length=0 data-items=150>
-                  </input>
-                  <input
-                    ng-if="queryfunc=='q' || queryfunc=='change' || queryfunc=='count'" ng-model="endDuration" ng-change="ctrl.addQueryVariableParameter('endDuration', endDuration, id)" class="gf-form-input" rows="1" spellcheck="false" placeholder="endDuration" data-min-length=0 data-items=150>
-                  </input>
-                  <input
-                    ng-if="queryfunc=='band' || queryfunc=='over' || queryfunc=='shiftBand' || queryfunc=='window'" ng-model="duration" ng-change="ctrl.addQueryVariableParameter('duration', duration, id)" class="gf-form-input" rows="1" spellcheck="false" placeholder="duration" data-min-length=0 data-items=150>
-                  </input>
-                  <input
-                    ng-if="queryfunc=='band' || queryfunc=='over' || queryfunc=='shiftBand' || queryfunc=='window'" ng-model="period" ng-change="ctrl.addQueryVariableParameter('period', period, id)" class="gf-form-input" rows="1" spellcheck="false" placeholder="period" data-min-length=0 data-items=150>
-                  </input>
-                  <input
-                    ng-if="queryfunc=='band' || queryfunc=='over' || queryfunc=='shiftBand' || queryfunc=='window'" ng-model="num" ng-change="ctrl.addQueryVariableParameter('num', num, id)" class="gf-form-input" rows="1" spellcheck="false" placeholder="num" data-min-length=0 data-items=150>
-                  </input>
-                  <input
-                    ng-if="queryfunc=='window'" ng-model="funcName" ng-change="ctrl.addQueryVariableParameter('funcName', funcName, id)" class="gf-form-input" rows="1" spellcheck="false" placeholder="funcName" data-min-length=0 data-items=150>
-                  </input>
-                </div>
-                <div ng-model="elem$index" />
-              </div>
-            </div>
-        </div>
-
-
-      <div class="gf-form" style="width:80%;align-items:flex-start;">
-          <div class="gf-form" style="width:80%;align-items:flex-start;">
-            <label class="gf-form-label query-keyword" ng-click="ctrl.addNewVariable()">
-              Var +
-            </label>
-            <label class="gf-form-label query-keyword" ng-click="ctrl.addNewVariableQ()">
-              Query +
-            </label>
-          </div>
-        </div>
-
-      <div class="gf-form" style="width:80%;align-items:flex-start;">
+      <div class="gf-form" style="width:80%;align-items:flex-start;margin-bottom:15px;">
         <label class="gf-form-label query-keyword">
-          Final Query
+          Variable
         </label>
-        <textarea class="gf-form-input" rows="1" ng-model="finalQuery" spellcheck='false' placeholder='$query'
-            data-min-length=0 data-items=15 ng-change="ctrl.updateFinalQuery(finalQuery)">
-         </textarea>
+        <input
+          class="gf-form-input" rows="1" ng-model="inputName" spellcheck="false" placeholder="variable name" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.addVariableName(inputName, id)">
+        </input>
+        <input
+          class="gf-form-input" rows="1" ng-model="inputValue" spellcheck='false' placeholder='value' data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.addVariableValue(inputValue, id)">
+        </input>
       </div>
 
     </div>
-    <div ng-if="ctrl.datasource.showHelper">
-        <section class="grafana-metric-options gf-form-group">
-            <div class="gf-form-inline ">
-                <div class="gf-form ">
-                    <button class="btn btn-inverse " ng-click="ctrl.target.expandHelper=ctrl.target.expandHelper==0 ? 1:0;
+
+    <div ng-if="variable.type == 'queryVariable'">
+      <div id="query-variable-{{$index}}" class="gf-form-inline" style="align-items:flex-start; margin-bottom: 15px">
+
+        <div class="gf-form" style="width:80%;align-items:flex-start;">
+          <label class="gf-form-label query-keyword">
+            Query Variable
+          </label>
+          <input
+            class="gf-form-input" rows="1" ng-model="inputValue" spellcheck="false" placeholder="query variable name" data-min-length=0 data-items=150 ng-change="ctrl.addQueryVariableParameter('queryVariableName', inputValue, id)">
+          </input>
+        </div>
+        <div class="gf-form" style="width:80%;align-items:flex-start;">
+          <label class="gf-form-label query-keyword">
+            Query Function
+          </label>
+          <select ng-model="queryfunc" class="gf-form-input" ng-change="ctrl.addQueryVariableParameter('queryFunction', queryfunc, id)">
+            <option ng-repeat="queryFunction in queryFunctions">{{queryFunction.func}}</option>
+          </select>
+
+        </div>
+        <div class="gf-form" style="width:80%;align-items:flex-start;">
+          <!--                  getMetricSuggestions-->
+          <label class="gf-form-label query-keyword">
+            Metric
+          </label>
+          <input list="responseSuggestions"
+                 class="gf-form-input" rows="1" ng-model="typeahead" onspellcheck="false" placeholder="query variable name" data-min-length=0 data-items=150 ng-change="ctrl.getMetricSuggestions(typeahead); ctrl.addQueryVariableParameter('metric', typeahead, id)">
+          </input>
+          <datalist id="responseSuggestions">
+            <option ng-repeat="suggestion in suggestions track by $index">{{suggestion}}</option>
+          </datalist>
+        </div>
+        <div class="gf-form" style="width:80%;align-items:flex-start;">
+          <label class="gf-form-label query-keyword">
+            Tags
+          </label>
+          <label class="gf-form-label query-keyword"ng-click="ctrl.addTagBox(id)">
+            +
+          </label>
+
+          <label
+            class="gf-form-label" style="overflow: hidden; height: 85px" ng-repeat="(tagId, name) in tagBoxes[id]">
+            <input class="gf-form-input" style="float:left" ng-model="tagInputKey" ng-change="ctrl.editTagBox(id, tagId, tagInputKey, 'key')" rows="1" spellcheck="false" placeholder="enter tag key" data-min-length=0 data-items=150>
+            <input class="gf-form-input" style="float: left" ng-model="tagInputValue" ng-change="ctrl.editTagBox(id, tagId, tagInputValue, 'value')" rows="1" spellcheck="false" placeholder="enter tag value" data-min-length=0 data-items=150>
+          </label>
+        </div>
+        <div class="gf-form" style="width:80%;align-items:flex-start;" ng-query-ctrl="ctrl">
+          <label class="gf-form-label query-keyword">
+            Agg
+          </label>
+          <select class="gf-form-input" ng-model="agg" ng-change="ctrl.addQueryVariableParameter('queryAgg', agg, id)">
+            <option ng-repeat="aggOption in aggOptions">{{aggOption.text}}</option>
+          </select>
+        </div>
+        <div class="gf-form" style="width:80%;align-items:flex-start;">
+          <label class="gf-form-label query-keyword">
+            Downsample
+          </label>
+          <input
+            class="gf-form-input" ng-model="downsampleTime" ng-change="ctrl.addQueryVariableParameter('downsampleTime', downsampleTime, id)" rows="1" spellcheck="false" placeholder="1h" data-min-length=0 data-items=150>
+          </input>
+          <select class="gf-form-input" ng-model="downsampleAgg" ng-change="ctrl.addQueryVariableParameter('downsampleAgg', downsampleAgg, id)">
+            <option ng-repeat="aggOption in aggOptions">{{aggOption.text}}</option>
+          </select>
+          <select class="gf-form-input" ng-model="fillPolicy" ng-change="ctrl.addQueryVariableParameter('fillPolicy', fillPolicy, id)">
+            <option ng-repeat="fillPolicy in fillPolicies">{{fillPolicy.text}}</option>
+          </select>
+        </div>
+        <div class="gf-form" style="width:80%;align-items:flex-start;margin-bottom:15px;">
+          <label class="gf-form-label query-keyword">
+            Query Args
+          </label>
+
+          <input
+            ng-if="queryfunc=='q' || queryfunc=='change' || queryfunc=='count'" ng-model="startDuration" ng-change="ctrl.addQueryVariableParameter('startDuration', startDuration, id)" class="gf-form-input" rows="1" spellcheck="false" placeholder="startDuration" data-min-length=0 data-items=150>
+          </input>
+          <input
+            ng-if="queryfunc=='q' || queryfunc=='change' || queryfunc=='count'" ng-model="endDuration" ng-change="ctrl.addQueryVariableParameter('endDuration', endDuration, id)" class="gf-form-input" rows="1" spellcheck="false" placeholder="endDuration" data-min-length=0 data-items=150>
+          </input>
+          <input
+            ng-if="queryfunc=='band' || queryfunc=='over' || queryfunc=='shiftBand' || queryfunc=='window'" ng-model="duration" ng-change="ctrl.addQueryVariableParameter('duration', duration, id)" class="gf-form-input" rows="1" spellcheck="false" placeholder="duration" data-min-length=0 data-items=150>
+          </input>
+          <input
+            ng-if="queryfunc=='band' || queryfunc=='over' || queryfunc=='shiftBand' || queryfunc=='window'" ng-model="period" ng-change="ctrl.addQueryVariableParameter('period', period, id)" class="gf-form-input" rows="1" spellcheck="false" placeholder="period" data-min-length=0 data-items=150>
+          </input>
+          <input
+            ng-if="queryfunc=='band' || queryfunc=='over' || queryfunc=='shiftBand' || queryfunc=='window'" ng-model="num" ng-change="ctrl.addQueryVariableParameter('num', num, id)" class="gf-form-input" rows="1" spellcheck="false" placeholder="num" data-min-length=0 data-items=150>
+          </input>
+          <input
+            ng-if="queryfunc=='window'" ng-model="funcName" ng-change="ctrl.addQueryVariableParameter('funcName', funcName, id)" class="gf-form-input" rows="1" spellcheck="false" placeholder="funcName" data-min-length=0 data-items=150>
+          </input>
+        </div>
+        <div ng-model="elem$index" />
+      </div>
+    </div>
+  </div>
+
+
+  <div class="gf-form" style="width:80%;align-items:flex-start;">
+    <div class="gf-form" style="width:80%;align-items:flex-start;">
+      <label class="gf-form-label query-keyword" ng-click="ctrl.addNewVariable()">
+        Var +
+      </label>
+      <label class="gf-form-label query-keyword" ng-click="ctrl.addNewVariableQ()">
+        Query +
+      </label>
+    </div>
+  </div>
+
+  <div class="gf-form" style="width:80%;align-items:flex-start;">
+    <label class="gf-form-label query-keyword">
+      Final Query
+    </label>
+    <textarea class="gf-form-input" rows="1" ng-model="finalQuery" spellcheck='false' placeholder='$query'
+              data-min-length=0 data-items=15 ng-change="ctrl.updateFinalQuery(finalQuery)">
+         </textarea>
+  </div>
+
+  </div>
+  <div ng-if="ctrl.datasource.showHelper">
+    <section class="grafana-metric-options gf-form-group">
+      <div class="gf-form-inline ">
+        <div class="gf-form ">
+          <button class="btn btn-inverse " ng-click="ctrl.target.expandHelper=ctrl.target.expandHelper==0 ? 1:0;
             " bs-tooltip="
             'This shows the OpenTSDB query helper. If you are using Bosun with OpenTSDB and are indexing your OpenTSDB data to Bosun, you can use this to build q() functions based on the metadata Bosun has.' ">OpenTSDB Query Function Helper</button>
-                </div>
-            </div>
-        </section>
-
-        <div class="gf-form-group gf-form-horizontal " ng-show="ctrl.target.expandHelper===1 ">
-            <div class="gf-form-group ">
-                <div class="gf-form ">
-                    <label class="gf-form-label width-10 ">
-                    Metric
-                </label>
-                    <input type="text " class="gf-form-input " ng-model="ctrl.queryHelper.metric " spellcheck='false' bs-typeahead="ctrl.suggestMetrics "
-                        placeholder="metric name " data-min-length=0 data-items=100 ng-change="ctrl.metricInfo() " ng-blur="ctrl.targetBlur() ">
-                    </input>
-                </div>
-                <div class="gf-form " ng-repeat="(i, tagInfo) in ctrl.queryHelper.tagKeysToValues ">
-                    <div class="gf-form ">
-                        <label class="gf-form-label width-10 " ng-bind="tagInfo.key "></label>
-                        <input type="text " class="gf-form-input " spellcheck='false' bs-typeahead="tagInfo.value " ng-model="ctrl.queryHelper.tagKeysToValues[i].selectedValue "
-                            ng-change="ctrl.suggestQuery() ">
-                        </input>
-                    </div>
-                    <div class="gf-form ">
-                        <div class="gf-form-select-wrapper ">
-                            <select class="gf-form-input gf-size-auto " ng-model="ctrl.queryHelper.tagKeysToValues[i].filterType
-            " ng-options="f for f in ctrl.filterTypes " ng-change="ctrl.suggestQuery() "></select>
-                        </div>
-                    </div>
-                </div>
-                <div class="gf-form-inline ">
-                    <div class="gf-form gf-form--grow ">
-                        <label class="gf-form-label width-10 ">Generated Query</label>
-                        <input type="text " class="gf-form-input " ng-model="ctrl.queryHelper.suggestedQuery " readonly></input>
-                    </div>
-                    <div class="gf-form ">
-                        <button class="btn btn-inverse width-12 " ng-model="ctrl.queryHelper.suggestedQuery " ng-click="ctrl.addSuggest() ">Add To Query</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="gf-form-group ">
-                <div class="gf-form-inline ">
-                    <div class="gf-form ">
-                        <label class="gf-form-label width-10 ">Unit</label>
-                        <input type="text " class="gf-form-input max-width-12 " ng-model="ctrl.queryHelper.unit " readonly></input>
-                    </div>
-                    <div ng-if="ctrl.panelCtrl.panel.type==='graph' " class="gf-form ">
-                        <button class="btn btn-inverse width-12 " ng-model="ctrl.queryHelper.suggestedQuery " ng-click="ctrl.labelFromUnit() ">Set Y Axis Label</button>
-                    </div>
-                    <div ng-if="ctrl.panelCtrl.panel.type==='singlestat' " class="gf-form ">
-                        <button class="btn btn-inverse width-12 " ng-model="ctrl.queryHelper.suggestedQuery " ng-click="ctrl.labelFromUnit() ">Set Postfix</button>
-                    </div>
-                </div>
-                <div class="gf-form ">
-                    <label class="gf-form-label width-10 ">Rate Type</label>
-                    <input type="text " class="gf-form-input max-width-12 " ng-model="ctrl.queryHelper.rate " readonly></input>
-                </div>
-                <div class="gf-form ">
-                    <label class="gf-form-label width-10 ">Desc</label>
-                    <textarea class="gf-form-input " ng-model="ctrl.queryHelper.desc " readonly></textarea>
-                </div>
-            </div>
         </div>
+      </div>
+    </section>
+
+    <div class="gf-form-group gf-form-horizontal " ng-show="ctrl.target.expandHelper===1 ">
+      <div class="gf-form-group ">
+        <div class="gf-form ">
+          <label class="gf-form-label width-10 ">
+            Metric
+          </label>
+          <input type="text " class="gf-form-input " ng-model="ctrl.queryHelper.metric " spellcheck='false' bs-typeahead="ctrl.suggestMetrics "
+                 placeholder="metric name " data-min-length=0 data-items=100 ng-change="ctrl.metricInfo() " ng-blur="ctrl.targetBlur() ">
+          </input>
+        </div>
+        <div class="gf-form " ng-repeat="(i, tagInfo) in ctrl.queryHelper.tagKeysToValues ">
+          <div class="gf-form ">
+            <label class="gf-form-label width-10 " ng-bind="tagInfo.key "></label>
+            <input type="text " class="gf-form-input " spellcheck='false' bs-typeahead="tagInfo.value " ng-model="ctrl.queryHelper.tagKeysToValues[i].selectedValue "
+                   ng-change="ctrl.suggestQuery() ">
+            </input>
+          </div>
+          <div class="gf-form ">
+            <div class="gf-form-select-wrapper ">
+              <select class="gf-form-input gf-size-auto " ng-model="ctrl.queryHelper.tagKeysToValues[i].filterType
+            " ng-options="f for f in ctrl.filterTypes " ng-change="ctrl.suggestQuery() "></select>
+            </div>
+          </div>
+        </div>
+        <div class="gf-form-inline ">
+          <div class="gf-form gf-form--grow ">
+            <label class="gf-form-label width-10 ">Generated Query</label>
+            <input type="text " class="gf-form-input " ng-model="ctrl.queryHelper.suggestedQuery " readonly></input>
+          </div>
+          <div class="gf-form ">
+            <button class="btn btn-inverse width-12 " ng-model="ctrl.queryHelper.suggestedQuery " ng-click="ctrl.addSuggest() ">Add To Query</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="gf-form-group ">
+        <div class="gf-form-inline ">
+          <div class="gf-form ">
+            <label class="gf-form-label width-10 ">Unit</label>
+            <input type="text " class="gf-form-input max-width-12 " ng-model="ctrl.queryHelper.unit " readonly></input>
+          </div>
+          <div ng-if="ctrl.panelCtrl.panel.type==='graph' " class="gf-form ">
+            <button class="btn btn-inverse width-12 " ng-model="ctrl.queryHelper.suggestedQuery " ng-click="ctrl.labelFromUnit() ">Set Y Axis Label</button>
+          </div>
+          <div ng-if="ctrl.panelCtrl.panel.type==='singlestat' " class="gf-form ">
+            <button class="btn btn-inverse width-12 " ng-model="ctrl.queryHelper.suggestedQuery " ng-click="ctrl.labelFromUnit() ">Set Postfix</button>
+          </div>
+        </div>
+        <div class="gf-form ">
+          <label class="gf-form-label width-10 ">Rate Type</label>
+          <input type="text " class="gf-form-input max-width-12 " ng-model="ctrl.queryHelper.rate " readonly></input>
+        </div>
+        <div class="gf-form ">
+          <label class="gf-form-label width-10 ">Desc</label>
+          <textarea class="gf-form-input " ng-model="ctrl.queryHelper.desc " readonly></textarea>
+        </div>
+      </div>
     </div>
+  </div>
 </query-editor-row>
