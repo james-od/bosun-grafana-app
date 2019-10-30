@@ -1,9 +1,9 @@
 "use strict";
 
-System.register(["app/plugins/sdk", "./css/query-editor.css!", "sortablejs"], function (_export, _context) {
+System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/Sortable.min"], function (_export, _context) {
   "use strict";
 
-  var QueryCtrl, BosunDatasourceQueryCtrl;
+  var QueryCtrl, Sortable, BosunDatasourceQueryCtrl;
 
   function _typeof(obj) {
     if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
@@ -91,7 +91,9 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "sortablejs"], fu
   return {
     setters: [function (_appPluginsSdk) {
       QueryCtrl = _appPluginsSdk.QueryCtrl;
-    }, function (_cssQueryEditorCss) {}, function (_sortablejs) {}],
+    }, function (_cssQueryEditorCss) {}, function (_externalSortableMin) {
+      Sortable = _externalSortableMin.default;
+    }],
     execute: function () {
       _export("BosunDatasourceQueryCtrl", BosunDatasourceQueryCtrl = function (_QueryCtrl) {
         _inherits(BosunDatasourceQueryCtrl, _QueryCtrl);
@@ -567,6 +569,8 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "sortablejs"], fu
               type: 'queryVariable'
             };
             this.scope.varCounter += 1;
+            var el = document.getElementById('items');
+            var sortable = Sortable.create(el);
             this.panelCtrl.refresh();
           }
         }, {

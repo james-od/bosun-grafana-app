@@ -27,6 +27,12 @@ module.exports = function(grunt) {
         src: ['img/**/*'],
         dest: 'dist/src/'
       },
+      externals: {
+        cwd: 'src',
+        expand: true,
+        src: ['**/external/*'],
+        dest: 'dist'
+      }
     },
 
     watch: {
@@ -56,5 +62,5 @@ module.exports = function(grunt) {
 
   });
 
-  grunt.registerTask('default', ['clean', 'copy:src_to_dist', 'copy:pluginDef', 'copy:img_to_dist', 'babel']);
+  grunt.registerTask('default', ['clean', 'copy:src_to_dist', 'copy:pluginDef', 'copy:img_to_dist', 'copy:externals', 'babel']);
 };

@@ -1,8 +1,6 @@
 import {QueryCtrl} from 'app/plugins/sdk';
 import './css/query-editor.css!';
-import 'sortablejs';
-// var el = document.getElementById('items');
-// var sortable = Sortable.create(el);
+import Sortable from './../external/Sortable.min';
 
 
 export class BosunDatasourceQueryCtrl extends QueryCtrl {
@@ -282,6 +280,8 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     console.log(this.scope)
     this.scope.variables[this.scope.varCounter] = {type: 'queryVariable'};
     this.scope.varCounter += 1;
+    var el = document.getElementById('items');
+    var sortable = Sortable.create(el);
     this.panelCtrl.refresh();
   }
 
