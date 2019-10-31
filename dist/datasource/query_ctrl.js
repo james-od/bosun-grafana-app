@@ -122,6 +122,7 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
           _this.getMetricSuggestions = _this.getMetricSuggestions.bind(_assertThisInitialized(_this));
           _this.buildQueryVariable = _this.buildQueryVariable.bind(_assertThisInitialized(_this));
           _this.addTagBox = _this.addTagBox.bind(_assertThisInitialized(_this));
+          _this.setSortable = _this.setSortable.bind(_assertThisInitialized(_this));
           _this.filterTypes = ["Group By", "Filter"];
           _this.scope.variables = {};
           _this.scope.aggOptions = [{
@@ -273,6 +274,12 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
         }
 
         _createClass(BosunDatasourceQueryCtrl, [{
+          key: "setSortable",
+          value: function setSortable() {
+            var el = document.getElementById('allVariables');
+            var sortable = Sortable.create(el);
+          }
+        }, {
           key: "suggestMetrics",
           value: function suggestMetrics(metric, callback) {
             return this.datasource._metricsStartWith(metric).then(callback);
@@ -559,6 +566,7 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
               type: 'variable'
             };
             this.scope.varCounter += 1;
+            this.setSortable();
             this.panelCtrl.refresh();
           }
         }, {
@@ -569,8 +577,7 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
               type: 'queryVariable'
             };
             this.scope.varCounter += 1;
-            var el = document.getElementById('items');
-            var sortable = Sortable.create(el);
+            this.setSortable();
             this.panelCtrl.refresh();
           }
         }, {

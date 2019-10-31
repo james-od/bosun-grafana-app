@@ -2,16 +2,11 @@
 
   <script></script>
 
-  <ul id="items">
-    <li>item 1</li>
-    <li>item 2</li>
-    <li>item 3</li>
-  </ul>
 
-  <div ng-repeat="(id, variable) in variables">
+  <ul id="allVariables">
+  <li ng-repeat="(id, variable) in variables">
 
     <div ng-if="variable.type == 'variable'">
-
       <div class="gf-form" style="width:80%;align-items:flex-start;margin-bottom:15px;">
         <label class="gf-form-label query-keyword">
           Variable
@@ -121,7 +116,8 @@
         <div ng-model="elem$index" />
       </div>
     </div>
-  </div>
+  </li>
+  </ul>
 
 
   <div class="gf-form" style="width:80%;align-items:flex-start;">

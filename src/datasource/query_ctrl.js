@@ -13,6 +13,7 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     this.uiSegmentSrv = uiSegmentSrv;
     this.target.expandHelper = 0;
     this.target.target = this.target.target || 'Bosun Query';
+    this.setSortable = this.setSortable.bind(this);
     this.suggestMetrics = this.suggestMetrics.bind(this);
     this.addSuggest = this.addSuggest.bind(this);
     this.labelFromUnit = this.labelFromUnit.bind(this);
@@ -43,6 +44,11 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     this.scope.varCounter = 0;
     this.scope.tagBoxCounter = 0;
     this.scope.finalQuery = "";
+  }
+
+  setSortable(){
+    var el = document.getElementById('allVariables');
+    var sortable = Sortable.create(el);
   }
 
   suggestMetrics(metric, callback) {
@@ -273,6 +279,7 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
   addNewVariable() {
     this.scope.variables[this.scope.varCounter] = {type: 'variable'};
     this.scope.varCounter += 1;
+    this.setSortable();
     this.panelCtrl.refresh();
   }
 
@@ -280,8 +287,7 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     console.log(this.scope)
     this.scope.variables[this.scope.varCounter] = {type: 'queryVariable'};
     this.scope.varCounter += 1;
-    var el = document.getElementById('items');
-    var sortable = Sortable.create(el);
+    this.setSortable();
     this.panelCtrl.refresh();
   }
 
