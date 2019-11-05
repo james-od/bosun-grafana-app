@@ -1,6 +1,7 @@
 import {QueryCtrl} from 'app/plugins/sdk';
 import './css/query-editor.css!';
 import Sortable from './../external/Sortable.min';
+import {QueryBuilderService} from "./queryBuilderService";
 
 
 export class BosunDatasourceQueryCtrl extends QueryCtrl {
@@ -14,6 +15,7 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     this.target.expandHelper = 0;
     this.target.target = this.target.target || 'Bosun Query';
     this.setSortable = this.setSortable.bind(this);
+    this.deleteVariable = this.deleteVariable.bind(this);
     this.suggestMetrics = this.suggestMetrics.bind(this);
     this.addSuggest = this.addSuggest.bind(this);
     this.labelFromUnit = this.labelFromUnit.bind(this);
@@ -24,7 +26,6 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     this.addNewVariable = this.addNewVariable.bind(this);
     this.addNewVariableQ = this.addNewVariableQ.bind(this);
     this.getMetricSuggestions = this.getMetricSuggestions.bind(this);
-    this.buildQueryVariable = this.buildQueryVariable.bind(this);
     this.addTagBox = this.addTagBox.bind(this);
     this.filterTypes = ["Group By", "Filter"]
     this.scope.variables = {};
@@ -44,11 +45,22 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     this.scope.varCounter = 0;
     this.scope.tagBoxCounter = 0;
     this.scope.finalQuery = "";
+    this.scope.subbedQuery = "";
+    this.scope.variableOrder = [];
+  }
+
+  deleteVariable(id){
+    delete this.scope.variables[id]
   }
 
   setSortable(){
     var el = document.getElementById('allVariables');
-    var sortable = Sortable.create(el);
+    let _this = this;
+    var sortable = Sortable.create(el, {
+      onUpdate(evt) {
+        _this.scope.variableOrder = evt.to.children;
+      }
+    });
   }
 
   suggestMetrics(metric, callback) {
@@ -131,33 +143,8 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
   }
 
   getSubstitutedFinalQuery(finalQuery) {
-    //Dictionary doesn't guarantee ordering, so convert to array and sort by key
-    var values = new Array();
-    for (var id in this.scope.variables) {
-      this.scope.variables[id]["id"] = id;
-      values.push(this.scope.variables[id]);
-    }
-    values.sort()
-    values = values.reverse()
-
-    var the_scope = this
-
-    var substitutedFinalQuery = finalQuery
-    values.forEach(function(value) {
-      if(value.type == "variable") {
-
-        if (value["name"] && value["name"].startsWith("$")) {
-          if (value["value"] == undefined) {
-            substitutedFinalQuery = substitutedFinalQuery.split(value["name"]).join("");
-          } else {
-            substitutedFinalQuery = substitutedFinalQuery.split(value["name"]).join(value["value"]);
-          }
-        }
-      }
-      if(value.type == "queryVariable") {
-        substitutedFinalQuery = substitutedFinalQuery.split(value.value["queryVariableName"]).join(the_scope.buildQueryVariable(value, value.id));
-      }
-    });
+    var qbs = new QueryBuilderService();
+    var substitutedFinalQuery = qbs.substituteFinalQuery(finalQuery, this);
     return substitutedFinalQuery;
   }
 
@@ -174,85 +161,6 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
       throw new ReferenceError("When trying to add value the requested variable id could not be found")
     }
     this.panelCtrl.refresh();
-  }
-
-  buildQueryVariable(parameterObject, id) {
-
-    var $scope = this.scope;
-    var params = parameterObject.value;
-    var constructedQuery = "";
-    if(!params){
-      throw new ReferenceError("No query parameters found")
-    }
-    if(params["queryFunction"]){
-      constructedQuery += params["queryFunction"] + '("'
-    }else{
-      throw new ReferenceError("Query function not set")
-    }
-    if(params["queryAgg"]){
-      constructedQuery += params["queryAgg"] + ":"
-    }else{
-      throw new ReferenceError("Query aggregator not set")
-    }
-    if(params["downsampleTime"]){
-      constructedQuery += params["downsampleTime"]
-      if(params["downsampleAgg"]){
-        constructedQuery += "-" + params["downsampleAgg"]
-      }
-      if(params["fillPolicy"]){
-        constructedQuery += "-" + params["fillPolicy"]
-      }
-    }
-    if(params["conversionFlag"]){
-      constructedQuery += ":" + params["conversionFlag"]
-    }
-    if(params["metric"]){
-      constructedQuery += ":" + params["metric"] + "{"
-    }else{
-      throw new ReferenceError("Query metric not set")
-    }
-    if(params["metricTags"]){
-      constructedQuery += params["metricTags"]
-    }
-    constructedQuery += "}"
-    if($scope.tagBoxes[id]){
-      var onFirstTag = true
-
-      constructedQuery += "{"
-      for (var tagMapping in $scope.tagBoxes[id]) {
-        if ($scope.tagBoxes[id].hasOwnProperty(tagMapping)) {
-          if(!onFirstTag){
-            constructedQuery += ", "
-          }else{onFirstTag = false;}
-          constructedQuery += $scope.tagBoxes[id][tagMapping]["key"] + "=" + $scope.tagBoxes[id][tagMapping]["value"]
-        }
-      }
-      constructedQuery += '}"'
-    }else{
-      constructedQuery += '{}"'
-    }
-    if(params["startDuration"]){
-      constructedQuery += ', "' + params["startDuration"] + '"'
-    }
-    if(params["endDuration"]){
-      constructedQuery += ', "' + params["endDuration"] + '"'
-    }
-    if(params["duration"]){
-      constructedQuery += ', "' + params["duration"] + '"'
-    }
-    if(params["period"]){
-      constructedQuery += ', "' + params["period"] + '"'
-    }
-    if(params["num"]){
-      constructedQuery += ', "' + params["num"] + '"'
-    }
-    if(params["funcName"]){
-      constructedQuery += ', "' + params["funcName"] + '"'
-    }
-    constructedQuery += ")";
-    this.panelCtrl.refresh();
-    console.log(constructedQuery);
-    return constructedQuery;
   }
 
   addQueryVariableParameter(inputType, inputValue, id) {
@@ -318,5 +226,5 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     }
   }
 }
-
+export default { BosunDatasourceQueryCtrl }
 BosunDatasourceQueryCtrl.templateUrl = 'datasource/partials/query.editor.html';

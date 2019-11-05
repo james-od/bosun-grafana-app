@@ -8,10 +8,13 @@
     "url": "git@github.com:bosun-monitor/bosun-grafana-app.git"
   },
   "devDependencies": {
-    "@babel/core": "7.6.4",
+    "@babel/cli": "^7.6.4",
+    "@babel/core": "^7.6.4",
     "@babel/preset-env": "^7.6.3",
     "@babel/preset-es2015": "~7.0.0-beta.53",
+    "babel-jest": "^24.9.0",
     "babel-plugin-transform-es2015-modules-systemjs": "^6.5.0",
+    "babel-preset-env": "^1.7.0",
     "grunt": "~0.4.5",
     "grunt-babel": "~8.0.0",
     "grunt-contrib-clean": "~0.6.0",
@@ -20,6 +23,7 @@
     "grunt-contrib-watch": "^0.6.1",
     "grunt-execute": "~0.2.2",
     "grunt-systemjs-builder": "^0.2.5",
+    "jest": "^24.9.0",
     "load-grunt-tasks": "~3.2.0"
   },
   "dependencies": {
@@ -28,6 +32,9 @@
     "angular-sanitize": "1.7.8",
     "lodash": ">=4.17.13",
     "sortablejs": "^1.10.1"
+  },
+  "scripts": {
+    "test": "jest"
   },
   "homepage": "https://bosun.org"
 }

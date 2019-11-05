@@ -1,9 +1,9 @@
 "use strict";
 
-System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/Sortable.min"], function (_export, _context) {
+System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/Sortable.min", "./queryBuilderService"], function (_export, _context) {
   "use strict";
 
-  var QueryCtrl, Sortable, BosunDatasourceQueryCtrl;
+  var QueryCtrl, Sortable, QueryBuilderService, BosunDatasourceQueryCtrl;
 
   function _typeof(obj) {
     if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
@@ -93,39 +93,41 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
       QueryCtrl = _appPluginsSdk.QueryCtrl;
     }, function (_cssQueryEditorCss) {}, function (_externalSortableMin) {
       Sortable = _externalSortableMin.default;
+    }, function (_queryBuilderService) {
+      QueryBuilderService = _queryBuilderService.QueryBuilderService;
     }],
     execute: function () {
       _export("BosunDatasourceQueryCtrl", BosunDatasourceQueryCtrl = function (_QueryCtrl) {
         _inherits(BosunDatasourceQueryCtrl, _QueryCtrl);
 
         function BosunDatasourceQueryCtrl($scope, $injector, uiSegmentSrv, $sce) {
-          var _this;
+          var _this2;
 
           _classCallCheck(this, BosunDatasourceQueryCtrl);
 
-          _this = _possibleConstructorReturn(this, _getPrototypeOf(BosunDatasourceQueryCtrl).call(this, $scope, $injector, $sce));
-          _this.scope = $scope;
-          _this.sce = $sce;
-          _this.queryHelper = {};
-          _this.uiSegmentSrv = uiSegmentSrv;
-          _this.target.expandHelper = 0;
-          _this.target.target = _this.target.target || 'Bosun Query';
-          _this.suggestMetrics = _this.suggestMetrics.bind(_assertThisInitialized(_this));
-          _this.addSuggest = _this.addSuggest.bind(_assertThisInitialized(_this));
-          _this.labelFromUnit = _this.labelFromUnit.bind(_assertThisInitialized(_this));
-          _this.metricInfo = _this.metricInfo.bind(_assertThisInitialized(_this));
-          _this.suggestQuery = _this.suggestQuery.bind(_assertThisInitialized(_this));
-          _this.suggestTagValues = _this.suggestTagValues.bind(_assertThisInitialized(_this));
-          _this.getSubstitutedFinalQuery = _this.getSubstitutedFinalQuery.bind(_assertThisInitialized(_this));
-          _this.addNewVariable = _this.addNewVariable.bind(_assertThisInitialized(_this));
-          _this.addNewVariableQ = _this.addNewVariableQ.bind(_assertThisInitialized(_this));
-          _this.getMetricSuggestions = _this.getMetricSuggestions.bind(_assertThisInitialized(_this));
-          _this.buildQueryVariable = _this.buildQueryVariable.bind(_assertThisInitialized(_this));
-          _this.addTagBox = _this.addTagBox.bind(_assertThisInitialized(_this));
-          _this.setSortable = _this.setSortable.bind(_assertThisInitialized(_this));
-          _this.filterTypes = ["Group By", "Filter"];
-          _this.scope.variables = {};
-          _this.scope.aggOptions = [{
+          _this2 = _possibleConstructorReturn(this, _getPrototypeOf(BosunDatasourceQueryCtrl).call(this, $scope, $injector, $sce));
+          _this2.scope = $scope;
+          _this2.sce = $sce;
+          _this2.queryHelper = {};
+          _this2.uiSegmentSrv = uiSegmentSrv;
+          _this2.target.expandHelper = 0;
+          _this2.target.target = _this2.target.target || 'Bosun Query';
+          _this2.setSortable = _this2.setSortable.bind(_assertThisInitialized(_this2));
+          _this2.deleteVariable = _this2.deleteVariable.bind(_assertThisInitialized(_this2));
+          _this2.suggestMetrics = _this2.suggestMetrics.bind(_assertThisInitialized(_this2));
+          _this2.addSuggest = _this2.addSuggest.bind(_assertThisInitialized(_this2));
+          _this2.labelFromUnit = _this2.labelFromUnit.bind(_assertThisInitialized(_this2));
+          _this2.metricInfo = _this2.metricInfo.bind(_assertThisInitialized(_this2));
+          _this2.suggestQuery = _this2.suggestQuery.bind(_assertThisInitialized(_this2));
+          _this2.suggestTagValues = _this2.suggestTagValues.bind(_assertThisInitialized(_this2));
+          _this2.getSubstitutedFinalQuery = _this2.getSubstitutedFinalQuery.bind(_assertThisInitialized(_this2));
+          _this2.addNewVariable = _this2.addNewVariable.bind(_assertThisInitialized(_this2));
+          _this2.addNewVariableQ = _this2.addNewVariableQ.bind(_assertThisInitialized(_this2));
+          _this2.getMetricSuggestions = _this2.getMetricSuggestions.bind(_assertThisInitialized(_this2));
+          _this2.addTagBox = _this2.addTagBox.bind(_assertThisInitialized(_this2));
+          _this2.filterTypes = ["Group By", "Filter"];
+          _this2.scope.variables = {};
+          _this2.scope.aggOptions = [{
             text: 'avg'
           }, {
             text: 'count'
@@ -194,7 +196,7 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
           }, {
             text: 'zimsum'
           }];
-          _this.scope.fillPolicies = [{
+          _this2.scope.fillPolicies = [{
             text: 'none'
           }, {
             text: 'nan'
@@ -203,7 +205,7 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
           }, {
             text: 'zero'
           }];
-          _this.scope.queryFunctions = [{
+          _this2.scope.queryFunctions = [{
             func: 'q',
             type: 'seriesSet',
             args: {
@@ -265,19 +267,37 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
               'funcName': 'string'
             }
           }];
-          _this.scope.suggestions = [];
-          _this.scope.tagBoxes = {};
-          _this.scope.varCounter = 0;
-          _this.scope.tagBoxCounter = 0;
-          _this.scope.finalQuery = "";
-          return _this;
+          _this2.scope.suggestions = [];
+          _this2.scope.tagBoxes = {};
+          _this2.scope.varCounter = 0;
+          _this2.scope.tagBoxCounter = 0;
+          _this2.scope.finalQuery = "";
+          _this2.scope.subbedQuery = "";
+          _this2.scope.variableOrder = [];
+          console.log(_this2.scope);
+          return _this2;
         }
 
         _createClass(BosunDatasourceQueryCtrl, [{
+          key: "deleteVariable",
+          value: function deleteVariable(id) {
+            console.log("delete variable");
+            console.log(this.scope.variables);
+            delete this.scope.variables[id];
+          }
+        }, {
           key: "setSortable",
           value: function setSortable() {
             var el = document.getElementById('allVariables');
-            var sortable = Sortable.create(el);
+
+            var _this = this;
+
+            var sortable = Sortable.create(el, {
+              onUpdate: function onUpdate(evt) {
+                console.log("Set variable order");
+                _this.scope.variableOrder = evt.to.children;
+              }
+            });
           }
         }, {
           key: "suggestMetrics",
@@ -287,11 +307,11 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
         }, {
           key: "metricInfo",
           value: function metricInfo() {
-            var _this2 = this;
+            var _this3 = this;
 
             return this.datasource._tagKeysForMetric(this.queryHelper.metric).then(function (tagKeys) {
-              _this2.datasource.q.all(_.map(tagKeys, function (tagKey) {
-                return _this2.datasource._tagValuesForMetricAndTagKey(_this2.queryHelper.metric, tagKey).then(function (tagValues) {
+              _this3.datasource.q.all(_.map(tagKeys, function (tagKey) {
+                return _this3.datasource._tagValuesForMetricAndTagKey(_this3.queryHelper.metric, tagKey).then(function (tagValues) {
                   return {
                     key: tagKey,
                     value: tagValues
@@ -301,16 +321,16 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
                 tagKeysToValues = _.each(tagKeysToValues, function (v) {
                   v.filterType = "Group By";
                 });
-                _this2.queryHelper.tagKeysToValues = tagKeysToValues;
+                _this3.queryHelper.tagKeysToValues = tagKeysToValues;
               });
             }).then(function () {
-              return _this2.datasource._metricMetadata(_this2.queryHelper.metric).then(function (metadata) {
-                _this2.queryHelper.rate = metadata.Rate;
-                _this2.queryHelper.unit = metadata.Unit;
-                _this2.queryHelper.desc = metadata.Desc;
+              return _this3.datasource._metricMetadata(_this3.queryHelper.metric).then(function (metadata) {
+                _this3.queryHelper.rate = metadata.Rate;
+                _this3.queryHelper.unit = metadata.Unit;
+                _this3.queryHelper.desc = metadata.Desc;
               });
             }).then(function () {
-              return _this2.suggestQuery();
+              return _this3.suggestQuery();
             });
           }
         }, {
@@ -332,7 +352,7 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
         }, {
           key: "suggestQuery",
           value: function suggestQuery() {
-            var _this3 = this;
+            var _this4 = this;
 
             var metric = this.queryHelper.metric || "metric.goes.here";
             var selectedGroupByTags = [];
@@ -340,11 +360,11 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
 
             _.each(this.queryHelper.tagKeysToValues, function (v) {
               if (v.selectedValue && v.selectedValue != "") {
-                if (v.filterType === _this3.filterTypes[0]) {
+                if (v.filterType === _this4.filterTypes[0]) {
                   selectedGroupByTags.push(v.key + "=" + v.selectedValue);
                 }
 
-                if (v.filterType === _this3.filterTypes[1]) {
+                if (v.filterType === _this4.filterTypes[1]) {
                   selectedFilterTags.push(v.key + "=" + v.selectedValue);
                 }
               }
@@ -385,33 +405,8 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
         }, {
           key: "getSubstitutedFinalQuery",
           value: function getSubstitutedFinalQuery(finalQuery) {
-            //Dictionary doesn't guarantee ordering, so convert to array and sort by key
-            var values = new Array();
-
-            for (var id in this.scope.variables) {
-              this.scope.variables[id]["id"] = id;
-              values.push(this.scope.variables[id]);
-            }
-
-            values.sort();
-            values = values.reverse();
-            var the_scope = this;
-            var substitutedFinalQuery = finalQuery;
-            values.forEach(function (value) {
-              if (value.type == "variable") {
-                if (value["name"] && value["name"].startsWith("$")) {
-                  if (value["value"] == undefined) {
-                    substitutedFinalQuery = substitutedFinalQuery.split(value["name"]).join("");
-                  } else {
-                    substitutedFinalQuery = substitutedFinalQuery.split(value["name"]).join(value["value"]);
-                  }
-                }
-              }
-
-              if (value.type == "queryVariable") {
-                substitutedFinalQuery = substitutedFinalQuery.split(value.value["queryVariableName"]).join(the_scope.buildQueryVariable(value, value.id));
-              }
-            });
+            var qbs = new QueryBuilderService();
+            var substitutedFinalQuery = qbs.substituteFinalQuery(finalQuery, this);
             return substitutedFinalQuery;
           }
         }, {
@@ -431,107 +426,6 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             }
 
             this.panelCtrl.refresh();
-          }
-        }, {
-          key: "buildQueryVariable",
-          value: function buildQueryVariable(parameterObject, id) {
-            var $scope = this.scope;
-            var params = parameterObject.value;
-            var constructedQuery = "";
-
-            if (!params) {
-              throw new ReferenceError("No query parameters found");
-            }
-
-            if (params["queryFunction"]) {
-              constructedQuery += params["queryFunction"] + '("';
-            } else {
-              throw new ReferenceError("Query function not set");
-            }
-
-            if (params["queryAgg"]) {
-              constructedQuery += params["queryAgg"] + ":";
-            } else {
-              throw new ReferenceError("Query aggregator not set");
-            }
-
-            if (params["downsampleTime"]) {
-              constructedQuery += params["downsampleTime"];
-
-              if (params["downsampleAgg"]) {
-                constructedQuery += "-" + params["downsampleAgg"];
-              }
-
-              if (params["fillPolicy"]) {
-                constructedQuery += "-" + params["fillPolicy"];
-              }
-            }
-
-            if (params["conversionFlag"]) {
-              constructedQuery += ":" + params["conversionFlag"];
-            }
-
-            if (params["metric"]) {
-              constructedQuery += ":" + params["metric"] + "{";
-            } else {
-              throw new ReferenceError("Query metric not set");
-            }
-
-            if (params["metricTags"]) {
-              constructedQuery += params["metricTags"];
-            }
-
-            constructedQuery += "}";
-
-            if ($scope.tagBoxes[id]) {
-              var onFirstTag = true;
-              constructedQuery += "{";
-
-              for (var tagMapping in $scope.tagBoxes[id]) {
-                if ($scope.tagBoxes[id].hasOwnProperty(tagMapping)) {
-                  if (!onFirstTag) {
-                    constructedQuery += ", ";
-                  } else {
-                    onFirstTag = false;
-                  }
-
-                  constructedQuery += $scope.tagBoxes[id][tagMapping]["key"] + "=" + $scope.tagBoxes[id][tagMapping]["value"];
-                }
-              }
-
-              constructedQuery += '}"';
-            } else {
-              constructedQuery += '{}"';
-            }
-
-            if (params["startDuration"]) {
-              constructedQuery += ', "' + params["startDuration"] + '"';
-            }
-
-            if (params["endDuration"]) {
-              constructedQuery += ', "' + params["endDuration"] + '"';
-            }
-
-            if (params["duration"]) {
-              constructedQuery += ', "' + params["duration"] + '"';
-            }
-
-            if (params["period"]) {
-              constructedQuery += ', "' + params["period"] + '"';
-            }
-
-            if (params["num"]) {
-              constructedQuery += ', "' + params["num"] + '"';
-            }
-
-            if (params["funcName"]) {
-              constructedQuery += ', "' + params["funcName"] + '"';
-            }
-
-            constructedQuery += ")";
-            this.panelCtrl.refresh();
-            console.log(constructedQuery);
-            return constructedQuery;
           }
         }, {
           key: "addQueryVariableParameter",
@@ -621,6 +515,10 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
       }(QueryCtrl));
 
       _export("BosunDatasourceQueryCtrl", BosunDatasourceQueryCtrl);
+
+      _export("default", {
+        BosunDatasourceQueryCtrl: BosunDatasourceQueryCtrl
+      });
 
       BosunDatasourceQueryCtrl.templateUrl = 'datasource/partials/query.editor.html';
     }

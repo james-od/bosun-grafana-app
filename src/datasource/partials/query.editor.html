@@ -4,7 +4,7 @@
 
 
   <ul id="allVariables">
-    <li ng-repeat="(id, variable) in variables">
+    <li ng-repeat="(id, variable) in variables" id="{{id}}">
 
       <div ng-if="variable.type == 'variable'">
         <div class="gf-form" style="width:80%;align-items:flex-start;margin-bottom:15px;">
@@ -12,11 +12,14 @@
             Variable
           </label>
           <input
-            class="gf-form-input" rows="1" ng-model="inputName" spellcheck="false" placeholder="variable name" data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.addVariableName(inputName, id)">
+            class="gf-form-input" rows="1" ng-model="variables[id].inputName" spellcheck="false" placeholder="variable name" data-min-length=0 data-items=150>
           </input>
           <input
-            class="gf-form-input" rows="1" ng-model="inputValue" spellcheck='false' placeholder='value' data-min-length=0 data-items=150 ng-model-onblur ng-change="ctrl.addVariableValue(inputValue, id)">
+            class="gf-form-input" rows="1" ng-model="variables[id].inputValue" spellcheck='false' placeholder='value' data-min-length=0 data-items=150r>
           </input>
+          <button class="gf-form-label" ng-click="ctrl.deleteVariable(id)">
+            Remove
+          </button>
         </div>
 
       </div>
@@ -31,6 +34,9 @@
             <input
               class="gf-form-input" rows="1" ng-model="inputValue" spellcheck="false" placeholder="query variable name" data-min-length=0 data-items=150 ng-change="ctrl.addQueryVariableParameter('queryVariableName', inputValue, id)">
             </input>
+            <button class="gf-form-label" ng-click="ctrl.deleteVariable(id)">
+              Remove
+            </button>
           </div>
           <div class="gf-form" style="width:80%;align-items:flex-start;">
             <label class="gf-form-label query-keyword">
@@ -135,9 +141,12 @@
       Final Query
     </label>
     <textarea class="gf-form-input" rows="1" ng-model="finalQuery" spellcheck='false' placeholder='$query'
-              data-min-length=0 data-items=15 ng-change="ctrl.updateFinalQuery(finalQuery)">
+              data-min-length=0 data-items=15 ng-change="ctrl.updateFinalQuery(finalQuery)" ng-click="ctrl.updateFinalQuery(finalQuery)">
          </textarea>
   </div>
+  <label class="gf-form-label">
+    {{subbedQuery}}
+  </label>
 
   </div>
   <div ng-if="ctrl.datasource.showHelper">
