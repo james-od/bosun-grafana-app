@@ -64,6 +64,8 @@ test('reordered simple substitutions', () => {
       2: {0: {key: "tagName", value: "$tagValue"}}
     }
   };
-  expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe("q(\"avg:1h-avg:example.metric{}{tagName=hello}\", \"1h\", \"2h\")");
+  expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe(
+    "q(\"avg:1h-avg:example.metric{}{tagName=hello}\", \"1h\", \"2h\")"
+  );
 });
 

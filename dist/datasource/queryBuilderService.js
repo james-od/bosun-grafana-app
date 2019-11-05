@@ -81,6 +81,9 @@ System.register([], function (_export, _context) {
         }, {
           key: "buildQueryVariable",
           value: function buildQueryVariable(parameterObject, id, scope) {
+            console.log(parameterObject);
+            console.log(id);
+            console.log(scope);
             var params = parameterObject.value;
             var constructedQuery = "";
 

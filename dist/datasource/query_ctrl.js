@@ -120,7 +120,6 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
           _this2.metricInfo = _this2.metricInfo.bind(_assertThisInitialized(_this2));
           _this2.suggestQuery = _this2.suggestQuery.bind(_assertThisInitialized(_this2));
           _this2.suggestTagValues = _this2.suggestTagValues.bind(_assertThisInitialized(_this2));
-          _this2.getSubstitutedFinalQuery = _this2.getSubstitutedFinalQuery.bind(_assertThisInitialized(_this2));
           _this2.addNewVariable = _this2.addNewVariable.bind(_assertThisInitialized(_this2));
           _this2.addNewVariableQ = _this2.addNewVariableQ.bind(_assertThisInitialized(_this2));
           _this2.getMetricSuggestions = _this2.getMetricSuggestions.bind(_assertThisInitialized(_this2));
@@ -280,7 +279,46 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
         _createClass(BosunDatasourceQueryCtrl, [{
           key: "deleteVariable",
           value: function deleteVariable(id) {
-            delete this.scope.variables[id];
+            console.log("BEFORE");
+            console.log(JSON.parse(JSON.stringify(this.scope.variables)));
+            console.log(this.scope.variableOrder); //delete variable
+
+            delete this.scope.variables[id]; //delete corresponding id in variableOrder
+
+            for (var i = 0; i < this.scope.variableOrder.length; i++) {
+              if (this.scope.variableOrder[i].id == id) {
+                this.scope.variableOrder[i].remove();
+              }
+            } //Reorder variables by variable order
+
+
+            var values = new Array();
+
+            if (this.scope.variableOrder.length) {
+              for (var i = 0; i < this.scope.variableOrder.length; i++) {
+                this.scope.variables[this.scope.variableOrder[i].id]["id"] = this.scope.variableOrder[i].id;
+                values.push(this.scope.variables[this.scope.variableOrder[i].id]);
+              }
+            } else {
+              for (var id in this.scope.variables) {
+                if (this.scope.variables.hasOwnProperty(id)) {
+                  this.scope.variables[id]["id"] = id;
+                  values.push(this.scope.variables[id]);
+                }
+              }
+            }
+
+            this.scope.variables = {};
+
+            for (var i = 0; i < values.length; i++) {
+              this.scope.variables[i] = values[i];
+            }
+
+            console.log("Values");
+            console.log(values);
+            console.log("AFTER");
+            console.log(JSON.parse(JSON.stringify(this.scope.variables)));
+            console.log(this.scope.variableOrder);
           }
         }, {
           key: "setSortable",
@@ -291,6 +329,8 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
 
             var sortable = Sortable.create(el, {
               onUpdate: function onUpdate(evt) {
+                console.log(evt);
+                console.log(_this.scope.variableOrder);
                 _this.scope.variableOrder = evt.to.children;
               }
             });
@@ -395,22 +435,14 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             })["catch"](function (error) {
               throw error;
             });
-            this.panelCtrl.refresh();
             return req;
-          }
-        }, {
-          key: "getSubstitutedFinalQuery",
-          value: function getSubstitutedFinalQuery(finalQuery) {
-            var qbs = new QueryBuilderService();
-            var substitutedFinalQuery = qbs.substituteFinalQuery(finalQuery, this);
-            return substitutedFinalQuery;
           }
         }, {
           key: "updateFinalQuery",
           value: function updateFinalQuery(finalQuery) {
             this.scope.finalQuery = finalQuery;
-            console.log(this.getSubstitutedFinalQuery(finalQuery));
-            this.panelCtrl.refresh();
+            var qbs = new QueryBuilderService();
+            return qbs.substituteFinalQuery(finalQuery, this);
           }
         }, {
           key: "addVariableValue",
@@ -420,8 +452,6 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             } else {
               throw new ReferenceError("When trying to add value the requested variable id could not be found");
             }
-
-            this.panelCtrl.refresh();
           }
         }, {
           key: "addQueryVariableParameter",
@@ -435,8 +465,6 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             } else {
               throw new ReferenceError("Requested queryVariable id could not be found");
             }
-
-            this.panelCtrl.refresh();
           }
         }, {
           key: "addVariableName",
@@ -446,8 +474,6 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             } else {
               throw new ReferenceError("When trying to add name the requested variable id could not be found");
             }
-
-            this.panelCtrl.refresh();
           }
         }, {
           key: "addNewVariable",
@@ -457,7 +483,6 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             };
             this.scope.varCounter += 1;
             this.setSortable();
-            this.panelCtrl.refresh();
           }
         }, {
           key: "addNewVariableQ",
@@ -468,19 +493,15 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             };
             this.scope.varCounter += 1;
             this.setSortable();
-            this.panelCtrl.refresh();
           }
         }, {
           key: "substituteVariables",
-          value: function substituteVariables(finalQuery) {
-            //TODO
-            this.panelCtrl.refresh();
+          value: function substituteVariables(finalQuery) {//TODO
           }
         }, {
           key: "editTagBox",
           value: function editTagBox(queryId, tagId, input, type) {
             this.scope.tagBoxes[parseInt(queryId)][parseInt(tagId)][type] = input;
-            this.panelCtrl.refresh();
           }
         }, {
           key: "addTagBox",
@@ -494,7 +515,6 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
               value: ""
             };
             this.scope.tagBoxCounter += 1;
-            this.panelCtrl.refresh();
           }
         }, {
           key: "addSuggest",

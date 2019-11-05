@@ -22,14 +22,20 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     this.metricInfo = this.metricInfo.bind(this);
     this.suggestQuery = this.suggestQuery.bind(this);
     this.suggestTagValues = this.suggestTagValues.bind(this);
-    this.getSubstitutedFinalQuery = this.getSubstitutedFinalQuery.bind(this);
     this.addNewVariable = this.addNewVariable.bind(this);
     this.addNewVariableQ = this.addNewVariableQ.bind(this);
     this.getMetricSuggestions = this.getMetricSuggestions.bind(this);
     this.addTagBox = this.addTagBox.bind(this);
     this.filterTypes = ["Group By", "Filter"]
     this.scope.variables = {};
-    this.scope.aggOptions = [{text: 'avg'}, {text: 'count'}, {text: 'dev'}, {text: 'diff'}, {text: 'ep50r3'}, {text: 'ep50r7'}, {text: 'ep75r3'}, {text: 'ep75r7'}, {text: 'ep90r3'}, {text: 'ep90r7'}, {text: 'ep95r3'}, {text: 'ep95r7'}, {text: 'ep99r3'}, {text: 'ep99r7'}, {text: 'ep999r3'}, {text: 'ep999r7'}, {text: 'first'}, {text: 'last'}, {text: 'median'}, {text: 'mimmin'}, {text: 'mimmax'}, {text: 'min'}, {text: 'max'}, {text: 'mult'}, {text: 'none'}, {text: 'p50'}, {text: 'p75'}, {text: 'p90'}, {text: 'p95'}, {text: 'p99'}, {text: 'p999'}, {text: 'pfsum'}, {text: 'sum'}, {text: 'zimsum'}];
+    this.scope.aggOptions = [
+      {text: 'avg'}, {text: 'count'}, {text: 'dev'}, {text: 'diff'}, {text: 'ep50r3'}, {text: 'ep50r7'},
+      {text: 'ep75r3'}, {text: 'ep75r7'}, {text: 'ep90r3'}, {text: 'ep90r7'}, {text: 'ep95r3'}, {text: 'ep95r7'},
+      {text: 'ep99r3'}, {text: 'ep99r7'}, {text: 'ep999r3'}, {text: 'ep999r7'}, {text: 'first'}, {text: 'last'},
+      {text: 'median'}, {text: 'mimmin'}, {text: 'mimmax'}, {text: 'min'}, {text: 'max'}, {text: 'mult'},
+      {text: 'none'}, {text: 'p50'}, {text: 'p75'}, {text: 'p90'}, {text: 'p95'}, {text: 'p99'}, {text: 'p999'},
+      {text: 'pfsum'}, {text: 'sum'}, {text: 'zimsum'}
+    ];
     this.scope.fillPolicies = [{text: 'none'}, {text: 'nan'}, {text: 'null'}, {text: 'zero'}];
     this.scope.queryFunctions = [
       {func: 'q', type:'seriesSet', args:{'query': 'string', 'startDuration': 'string', 'endDuration': 'string'}},
@@ -50,7 +56,35 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
   }
 
   deleteVariable(id){
-    delete this.scope.variables[id]
+    //delete variable
+    delete this.scope.variables[id];
+
+    //delete corresponding id in variableOrder
+    for(var i=0; i<this.scope.variableOrder.length; i++){
+      if(this.scope.variableOrder[i].id == id){
+        this.scope.variableOrder[i].remove()
+      }
+    }
+
+    //Reorder variables by variable order as deletion resets it
+    var values = new Array();
+    if (this.scope.variableOrder.length) {
+      for (var i = 0; i < this.scope.variableOrder.length; i++) {
+        this.scope.variables[this.scope.variableOrder[i].id]["id"] = this.scope.variableOrder[i].id
+        values.push(this.scope.variables[this.scope.variableOrder[i].id])
+      }
+    } else {
+      for (var id in this.scope.variables) {
+        if (this.scope.variables.hasOwnProperty(id)) {
+          this.scope.variables[id]["id"] = id
+          values.push(this.scope.variables[id])
+        }
+      }
+    }
+    this.scope.variables = {}
+    for(var i=0; i<values.length; i++){
+      this.scope.variables[i] = values[i];
+    }
   }
 
   setSortable(){
@@ -58,6 +92,8 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     let _this = this;
     var sortable = Sortable.create(el, {
       onUpdate(evt) {
+        console.log(evt)
+        console.log(_this.scope.variableOrder)
         _this.scope.variableOrder = evt.to.children;
       }
     });
@@ -138,20 +174,14 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     }).catch(function(error) {
       throw error;
     });
-    this.panelCtrl.refresh();
     return req
   }
 
-  getSubstitutedFinalQuery(finalQuery) {
-    var qbs = new QueryBuilderService();
-    var substitutedFinalQuery = qbs.substituteFinalQuery(finalQuery, this);
-    return substitutedFinalQuery;
-  }
 
   updateFinalQuery(finalQuery) {
     this.scope.finalQuery = finalQuery;
-    console.log(this.getSubstitutedFinalQuery(finalQuery))
-    this.panelCtrl.refresh();
+    var qbs = new QueryBuilderService();
+    return qbs.substituteFinalQuery(finalQuery, this);
   }
 
   addVariableValue(inputValue, id) {
@@ -160,7 +190,6 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     }else{
       throw new ReferenceError("When trying to add value the requested variable id could not be found")
     }
-    this.panelCtrl.refresh();
   }
 
   addQueryVariableParameter(inputType, inputValue, id) {
@@ -172,7 +201,6 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     }else{
       throw new ReferenceError("Requested queryVariable id could not be found")
     }
-    this.panelCtrl.refresh();
   }
 
   addVariableName(inputName, id) {
@@ -181,14 +209,12 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     }else{
       throw new ReferenceError("When trying to add name the requested variable id could not be found")
     }
-    this.panelCtrl.refresh();
   }
 
   addNewVariable() {
     this.scope.variables[this.scope.varCounter] = {type: 'variable'};
     this.scope.varCounter += 1;
     this.setSortable();
-    this.panelCtrl.refresh();
   }
 
   addNewVariableQ() {
@@ -196,17 +222,14 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     this.scope.variables[this.scope.varCounter] = {type: 'queryVariable'};
     this.scope.varCounter += 1;
     this.setSortable();
-    this.panelCtrl.refresh();
   }
 
   substituteVariables(finalQuery) {
     //TODO
-    this.panelCtrl.refresh();
   }
 
   editTagBox(queryId, tagId, input, type) {
     this.scope.tagBoxes[parseInt(queryId)][parseInt(tagId)][type] = input;
-    this.panelCtrl.refresh();
   }
 
   addTagBox(queryId) {
@@ -215,7 +238,6 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     }
     this.scope.tagBoxes[queryId][this.scope.tagBoxCounter] = {key: "", value: ""};
     this.scope.tagBoxCounter += 1;
-    this.panelCtrl.refresh();
   }
 
   addSuggest() {

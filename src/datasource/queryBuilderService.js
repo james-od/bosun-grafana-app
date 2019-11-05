@@ -47,6 +47,9 @@ export class QueryBuilderService {
 
   buildQueryVariable(parameterObject, id, scope) {
 
+    console.log(parameterObject)
+    console.log(id)
+    console.log(scope)
     var params = parameterObject.value;
     var constructedQuery = "";
     if(!params){
