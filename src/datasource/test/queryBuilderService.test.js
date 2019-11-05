@@ -50,24 +50,20 @@ test('reordered simple substitutions', () => {
   mocked_this.scope = {
     variables: {
       0: {type: "variable", inputName: "$time", inputValue: "1h"},
-      1: {
+      1: {type: "variable", inputName: "$tagValue", inputValue: "hello"},
+      2: {
         type: "queryVariable",
         value: {
           queryVariableName: "$q", queryFunction: "q", metric: "example.metric", queryAgg: "avg",
           downsampleTime: "$time", downsampleAgg: "avg", endDuration: "2h", startDuration:"$time"
         }
-      },
-      2: {type: "variable", inputName: "$tagValue", inputValue: "hello"}
+      }
     },
-    variableOrder: [
-      {id: 0},
-      {id: 2},
-      {id: 1}
-    ],
+    variableOrder: [],
     tagBoxes: {
-      1: {0: {key: "$tagValue", value: "hello"}}
+      2: {0: {key: "tagName", value: "$tagValue"}}
     }
   };
-  expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe("q(\"avg:1h-avg:example.metric{}{}\", \"1h\", \"2h\")");
+  expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe("q(\"avg:1h-avg:example.metric{}{tagName=hello}\", \"1h\", \"2h\")");
 });
 

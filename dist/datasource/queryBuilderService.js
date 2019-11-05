@@ -42,16 +42,14 @@ System.register([], function (_export, _context) {
             var values = new Array();
 
             if (_this.scope.variableOrder.length) {
-              console.log("Is variable order");
-
               for (var i = 0; i < _this.scope.variableOrder.length; i++) {
+                _this.scope.variables[_this.scope.variableOrder[i].id]["id"] = _this.scope.variableOrder[i].id;
                 values.push(_this.scope.variables[_this.scope.variableOrder[i].id]);
               }
             } else {
-              console.log("No variable order");
-
               for (var id in _this.scope.variables) {
                 if (_this.scope.variables.hasOwnProperty(id)) {
+                  _this.scope.variables[id]["id"] = id;
                   values.push(_this.scope.variables[id]);
                 }
               }
@@ -176,7 +174,6 @@ System.register([], function (_export, _context) {
             }
 
             constructedQuery += ")";
-            console.log(constructedQuery);
             return constructedQuery;
           }
         }]);

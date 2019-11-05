@@ -274,15 +274,12 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
           _this2.scope.finalQuery = "";
           _this2.scope.subbedQuery = "";
           _this2.scope.variableOrder = [];
-          console.log(_this2.scope);
           return _this2;
         }
 
         _createClass(BosunDatasourceQueryCtrl, [{
           key: "deleteVariable",
           value: function deleteVariable(id) {
-            console.log("delete variable");
-            console.log(this.scope.variables);
             delete this.scope.variables[id];
           }
         }, {
@@ -294,7 +291,6 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
 
             var sortable = Sortable.create(el, {
               onUpdate: function onUpdate(evt) {
-                console.log("Set variable order");
                 _this.scope.variableOrder = evt.to.children;
               }
             });
