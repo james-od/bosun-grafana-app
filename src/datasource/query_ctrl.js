@@ -179,8 +179,10 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
 
 
   updateFinalQuery(finalQuery) {
-    this.scope.finalQuery = finalQuery;
     var qbs = new QueryBuilderService();
+    this.target.expr = qbs.substituteFinalQuery(finalQuery, this);
+    this.panelCtrl.refresh();
+    this.scope.finalQuery = finalQuery;
     return qbs.substituteFinalQuery(finalQuery, this);
   }
 

@@ -169,7 +169,7 @@ System.register([], function (_export, _context) {
             }
 
             if (params["num"]) {
-              constructedQuery += ', "' + params["num"] + '"';
+              constructedQuery += ', ' + params["num"];
             }
 
             if (params["funcName"]) {

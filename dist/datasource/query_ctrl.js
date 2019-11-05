@@ -279,17 +279,14 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
         _createClass(BosunDatasourceQueryCtrl, [{
           key: "deleteVariable",
           value: function deleteVariable(id) {
-            console.log("BEFORE");
-            console.log(JSON.parse(JSON.stringify(this.scope.variables)));
-            console.log(this.scope.variableOrder); //delete variable
-
+            //delete variable
             delete this.scope.variables[id]; //delete corresponding id in variableOrder
 
             for (var i = 0; i < this.scope.variableOrder.length; i++) {
               if (this.scope.variableOrder[i].id == id) {
                 this.scope.variableOrder[i].remove();
               }
-            } //Reorder variables by variable order
+            } //Reorder variables by variable order as deletion resets it
 
 
             var values = new Array();
@@ -313,12 +310,6 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             for (var i = 0; i < values.length; i++) {
               this.scope.variables[i] = values[i];
             }
-
-            console.log("Values");
-            console.log(values);
-            console.log("AFTER");
-            console.log(JSON.parse(JSON.stringify(this.scope.variables)));
-            console.log(this.scope.variableOrder);
           }
         }, {
           key: "setSortable",
@@ -440,8 +431,10 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
         }, {
           key: "updateFinalQuery",
           value: function updateFinalQuery(finalQuery) {
-            this.scope.finalQuery = finalQuery;
             var qbs = new QueryBuilderService();
+            this.target.expr = qbs.substituteFinalQuery(finalQuery, this);
+            this.panelCtrl.refresh();
+            this.scope.finalQuery = finalQuery;
             return qbs.substituteFinalQuery(finalQuery, this);
           }
         }, {

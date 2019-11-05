@@ -115,7 +115,7 @@ export class QueryBuilderService {
       constructedQuery += ', "' + params["period"] + '"'
     }
     if(params["num"]){
-      constructedQuery += ', "' + params["num"] + '"'
+      constructedQuery += ', ' + params["num"]
     }
     if(params["funcName"]){
       constructedQuery += ', "' + params["funcName"] + '"'
