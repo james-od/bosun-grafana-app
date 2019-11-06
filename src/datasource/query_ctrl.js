@@ -27,7 +27,11 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     this.getMetricSuggestions = this.getMetricSuggestions.bind(this);
     this.addTagBox = this.addTagBox.bind(this);
     this.filterTypes = ["Group By", "Filter"]
-    this.scope.variables = {};
+    if(this.target.variables){
+      this.scope.variables = this.target.variables;
+    }else{
+      this.scope.variables = {};
+    }
     this.scope.aggOptions = [
       {text: 'avg'}, {text: 'count'}, {text: 'dev'}, {text: 'diff'}, {text: 'ep50r3'}, {text: 'ep50r7'},
       {text: 'ep75r3'}, {text: 'ep75r7'}, {text: 'ep90r3'}, {text: 'ep90r7'}, {text: 'ep95r3'}, {text: 'ep95r7'},
@@ -47,12 +51,22 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
       {func: 'window', type:'seriesSet', args:{'query': 'string', 'duration': 'string', 'period': 'string', 'num': 'scalar', 'funcName': 'string'}},
     ];
     this.scope.suggestions = [];
-    this.scope.tagBoxes = {};
+    if(this.target.tagBoxes){
+      this.scope.tagBoxes = this.target.tagBoxes;
+    }else{
+      this.scope.tagBoxes = {};
+    }
     this.scope.varCounter = 0;
-    this.scope.tagBoxCounter = 0;
+    if(!this.target.tagBoxCounter){
+      this.target.tagBoxCounter = 0;
+    }
     this.scope.finalQuery = "";
     this.scope.subbedQuery = "";
     this.scope.variableOrder = [];
+    console.log("Target")
+    console.log(this.target)
+    console.log("Scope")
+    console.log(this.scope)
   }
 
   deleteVariable(id){
@@ -85,6 +99,7 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     for(var i=0; i<values.length; i++){
       this.scope.variables[i] = values[i];
     }
+    this.target.variables= this.scope.variables;
   }
 
   setSortable(){
@@ -179,30 +194,13 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
 
 
   updateFinalQuery(finalQuery) {
+    this.target.variables= this.scope.variables;
+    console.log(this.target)
     var qbs = new QueryBuilderService();
     this.target.expr = qbs.substituteFinalQuery(finalQuery, this);
     this.panelCtrl.refresh();
     this.scope.finalQuery = finalQuery;
     return qbs.substituteFinalQuery(finalQuery, this);
-  }
-
-  addVariableValue(inputValue, id) {
-    if(this.scope.variables[id]){
-      this.scope.variables[id]["value"] = inputValue;
-    }else{
-      throw new ReferenceError("When trying to add value the requested variable id could not be found")
-    }
-  }
-
-  addQueryVariableParameter(inputType, inputValue, id) {
-    if(this.scope.variables[id]){
-      if(!this.scope.variables[id]["value"]){
-        this.scope.variables[id]["value"] = {}
-      }
-      this.scope.variables[id]["value"][inputType] = inputValue;
-    }else{
-      throw new ReferenceError("Requested queryVariable id could not be found")
-    }
   }
 
   addVariableName(inputName, id) {
@@ -211,12 +209,14 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     }else{
       throw new ReferenceError("When trying to add name the requested variable id could not be found")
     }
+    this.target.variables= this.scope.variables;
   }
 
   addNewVariable() {
     this.scope.variables[this.scope.varCounter] = {type: 'variable'};
     this.scope.varCounter += 1;
     this.setSortable();
+    this.target.variables = this.scope.variables;
   }
 
   addNewVariableQ() {
@@ -224,22 +224,25 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     this.scope.variables[this.scope.varCounter] = {type: 'queryVariable'};
     this.scope.varCounter += 1;
     this.setSortable();
+    this.target.variables= this.scope.variables;
   }
 
   substituteVariables(finalQuery) {
     //TODO
   }
 
-  editTagBox(queryId, tagId, input, type) {
-    this.scope.tagBoxes[parseInt(queryId)][parseInt(tagId)][type] = input;
+  editTagBox() {
+    this.target.tagBoxes= this.scope.tagBoxes;
   }
 
   addTagBox(queryId) {
     if(!this.scope.tagBoxes[queryId]){
       this.scope.tagBoxes[queryId] = {}
     }
-    this.scope.tagBoxes[queryId][this.scope.tagBoxCounter] = {key: "", value: ""};
-    this.scope.tagBoxCounter += 1;
+    console.log("tag box counter " + this.target.tagBoxCounter)
+    this.scope.tagBoxes[queryId][this.target.tagBoxCounter] = {key: "", value: ""};
+    this.target.tagBoxCounter += 1;
+    this.target.tagBoxes= this.scope.tagBoxes;
   }
 
   addSuggest() {

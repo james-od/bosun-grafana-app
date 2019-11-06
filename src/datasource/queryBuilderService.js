@@ -38,52 +38,51 @@ export class QueryBuilderService {
         }
       }
       if (value.type == "queryVariable") {
-        substitutedFinalQuery = substitutedFinalQuery.split(value.value["queryVariableName"]).join(the_service.buildQueryVariable(value, value.id, _this.scope));
+        substitutedFinalQuery = substitutedFinalQuery.split(value["inputValue"]).join(the_service.buildQueryVariable(value, value.id, _this.scope));
       }
     });
     _this.scope.subbedQuery = substitutedFinalQuery;
     return substitutedFinalQuery;
   }
 
-  buildQueryVariable(parameterObject, id, scope) {
+  buildQueryVariable(queryVariable, id, scope) {
 
-    console.log(parameterObject)
+    console.log(queryVariable)
     console.log(id)
     console.log(scope)
-    var params = parameterObject.value;
     var constructedQuery = "";
-    if(!params){
+    if(!queryVariable){
       throw new ReferenceError("No query parameters found")
     }
-    if(params["queryFunction"]){
-      constructedQuery += params["queryFunction"] + '("'
+    if(queryVariable["queryFunction"]){
+      constructedQuery += queryVariable["queryFunction"] + '("'
     }else{
       throw new ReferenceError("Query function not set")
     }
-    if(params["queryAgg"]){
-      constructedQuery += params["queryAgg"] + ":"
+    if(queryVariable["queryAgg"]){
+      constructedQuery += queryVariable["queryAgg"] + ":"
     }else{
       throw new ReferenceError("Query aggregator not set")
     }
-    if(params["downsampleTime"]){
-      constructedQuery += params["downsampleTime"]
-      if(params["downsampleAgg"]){
-        constructedQuery += "-" + params["downsampleAgg"]
+    if(queryVariable["downsampleTime"]){
+      constructedQuery += queryVariable["downsampleTime"]
+      if(queryVariable["downsampleAgg"]){
+        constructedQuery += "-" + queryVariable["downsampleAgg"]
       }
-      if(params["fillPolicy"]){
-        constructedQuery += "-" + params["fillPolicy"]
+      if(queryVariable["fillPolicy"]){
+        constructedQuery += "-" + queryVariable["fillPolicy"]
       }
     }
-    if(params["conversionFlag"]){
-      constructedQuery += ":" + params["conversionFlag"]
+    if(queryVariable["conversionFlag"]){
+      constructedQuery += ":" + queryVariable["conversionFlag"]
     }
-    if(params["metric"]){
-      constructedQuery += ":" + params["metric"] + "{"
+    if(queryVariable["metric"]){
+      constructedQuery += ":" + queryVariable["metric"] + "{"
     }else{
       throw new ReferenceError("Query metric not set")
     }
-    if(params["metricTags"]){
-      constructedQuery += params["metricTags"]
+    if(queryVariable["metricTags"]){
+      constructedQuery += queryVariable["metricTags"]
     }
     constructedQuery += "}"
     if(scope.tagBoxes[id]){
@@ -102,25 +101,26 @@ export class QueryBuilderService {
     }else{
       constructedQuery += '{}"'
     }
-    if(params["startDuration"]){
-      constructedQuery += ', "' + params["startDuration"] + '"'
+    if(queryVariable["startDuration"]){
+      constructedQuery += ', "' + queryVariable["startDuration"] + '"'
     }
-    if(params["endDuration"]){
-      constructedQuery += ', "' + params["endDuration"] + '"'
+    if(queryVariable["endDuration"]){
+      constructedQuery += ', "' + queryVariable["endDuration"] + '"'
     }
-    if(params["duration"]){
-      constructedQuery += ', "' + params["duration"] + '"'
+    if(queryVariable["duration"]){
+      constructedQuery += ', "' + queryVariable["duration"] + '"'
     }
-    if(params["period"]){
-      constructedQuery += ', "' + params["period"] + '"'
+    if(queryVariable["period"]){
+      constructedQuery += ', "' + queryVariable["period"] + '"'
     }
-    if(params["num"]){
-      constructedQuery += ', ' + params["num"]
+    if(queryVariable["num"]){
+      constructedQuery += ', ' + queryVariable["num"]
     }
-    if(params["funcName"]){
-      constructedQuery += ', "' + params["funcName"] + '"'
+    if(queryVariable["funcName"]){
+      constructedQuery += ', "' + queryVariable["funcName"] + '"'
     }
     constructedQuery += ")";
+    console.log(constructedQuery)
     return constructedQuery;
   }
 }
