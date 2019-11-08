@@ -1,9 +1,6 @@
 <query-editor-row query-ctrl="ctrl">
 
-  <script></script>
-
-
-  <ul id="allVariables">
+  <ul id="allVariables" ng-init="ctrl.setSortable()">
     <li ng-repeat="(id, variable) in ctrl.target.variables" id="{{id}}">
 
       <div ng-if="variable.type == 'variable'">
@@ -127,10 +124,10 @@
 
   <div class="gf-form" style="width:80%;align-items:flex-start;">
     <div class="gf-form" style="width:80%;align-items:flex-start;">
-      <label class="gf-form-label query-keyword" ng-click="ctrl.addNewVariable()">
+      <label class="gf-form-label query-keyword" ng-click="ctrl.addNewVariable('variable')">
         Var +
       </label>
-      <label class="gf-form-label query-keyword" ng-click="ctrl.addNewVariableQ()">
+      <label class="gf-form-label query-keyword" ng-click="ctrl.addNewVariable('queryVariable')">
         Query +
       </label>
     </div>
@@ -145,7 +142,7 @@
          </textarea>
   </div>
   <label class="gf-form-label">
-    {{subbedQuery}}
+    {{ctrl.target.subbedQuery}}
   </label>
 
   </div>

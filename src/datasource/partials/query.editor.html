@@ -1,9 +1,6 @@
 <query-editor-row query-ctrl="ctrl">
 
-  <script></script>
-
-
-  <ul id="allVariables">
+  <ul id="allVariables" ng-init="ctrl.setSortable()">
     <li ng-repeat="(id, variable) in ctrl.target.variables" id="{{id}}">
 
       <div ng-if="variable.type == 'variable'">

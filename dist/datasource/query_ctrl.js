@@ -121,7 +121,6 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
           _this2.suggestQuery = _this2.suggestQuery.bind(_assertThisInitialized(_this2));
           _this2.suggestTagValues = _this2.suggestTagValues.bind(_assertThisInitialized(_this2));
           _this2.addNewVariable = _this2.addNewVariable.bind(_assertThisInitialized(_this2));
-          _this2.addNewVariableQ = _this2.addNewVariableQ.bind(_assertThisInitialized(_this2));
           _this2.getMetricSuggestions = _this2.getMetricSuggestions.bind(_assertThisInitialized(_this2));
           _this2.addTagBox = _this2.addTagBox.bind(_assertThisInitialized(_this2));
           _this2.filterTypes = ["Group By", "Filter"];
@@ -276,7 +275,9 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             _this2.target.tagBoxes = {};
           }
 
-          _this2.scope.varCounter = 0;
+          if (!_this2.target.varCounter) {
+            _this2.target.varCounter = 0;
+          }
 
           if (!_this2.target.tagBoxCounter) {
             _this2.target.tagBoxCounter = 0;
@@ -286,34 +287,34 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             _this2.target.finalQuery = "";
           }
 
-          _this2.scope.subbedQuery = "";
-          _this2.scope.variableOrder = [];
-          console.log("Target");
+          _this2.target.subbedQuery = "";
+
+          if (!_this2.target.variableOrder) {
+            _this2.target.variableOrder = [];
+          }
+
           console.log(_this2.target);
-          console.log("Scope");
-          console.log(_this2.scope);
           return _this2;
         }
 
         _createClass(BosunDatasourceQueryCtrl, [{
           key: "deleteVariable",
           value: function deleteVariable(id) {
-            //delete variable
             delete this.target.variables[id]; //delete corresponding id in variableOrder
 
-            for (var i = 0; i < this.scope.variableOrder.length; i++) {
-              if (this.scope.variableOrder[i].id == id) {
-                this.scope.variableOrder[i].remove();
+            for (var i = 0; i < this.target.variableOrder.length; i++) {
+              if (this.target.variableOrder[i].id == id) {
+                this.target.variableOrder[i].remove();
               }
             } //Reorder variables by variable order as deletion resets it
 
 
             var values = new Array();
 
-            if (this.scope.variableOrder.length) {
-              for (var i = 0; i < this.scope.variableOrder.length; i++) {
-                this.target.variables[this.scope.variableOrder[i].id]["id"] = this.scope.variableOrder[i].id;
-                values.push(this.target.variables[this.scope.variableOrder[i].id]);
+            if (this.target.variableOrder.length) {
+              for (var i = 0; i < this.target.variableOrder.length; i++) {
+                this.target.variables[this.target.variableOrder[i].id]["id"] = this.target.variableOrder[i].id;
+                values.push(this.target.variables[this.target.variableOrder[i].id]);
               }
             } else {
               for (var id in this.target.variables) {
@@ -329,8 +330,6 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             for (var i = 0; i < values.length; i++) {
               this.target.variables[i] = values[i];
             }
-
-            this.target.variables = this.target.variables;
           }
         }, {
           key: "setSortable",
@@ -341,9 +340,7 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
 
             var sortable = Sortable.create(el, {
               onUpdate: function onUpdate(evt) {
-                console.log(evt);
-                console.log(_this.scope.variableOrder);
-                _this.scope.variableOrder = evt.to.children;
+                _this.target.variableOrder = evt.to.children;
               }
             });
           }
@@ -452,7 +449,6 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
         }, {
           key: "updateFinalQuery",
           value: function updateFinalQuery(finalQuery) {
-            console.log(this.target);
             var qbs = new QueryBuilderService();
             this.target.expr = qbs.substituteFinalQuery(finalQuery, this);
             this.panelCtrl.refresh();
@@ -460,30 +456,12 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             return qbs.substituteFinalQuery(finalQuery, this);
           }
         }, {
-          key: "addVariableName",
-          value: function addVariableName(inputName, id) {
-            if (this.target.variables[id]) {
-              this.target.variables[id]["name"] = inputName;
-            } else {
-              throw new ReferenceError("When trying to add name the requested variable id could not be found");
-            }
-          }
-        }, {
           key: "addNewVariable",
-          value: function addNewVariable() {
-            this.target.variables[this.scope.varCounter] = {
-              type: 'variable'
+          value: function addNewVariable(type) {
+            this.target.variables[this.target.varCounter] = {
+              type: type
             };
-            this.scope.varCounter += 1;
-            this.setSortable();
-          }
-        }, {
-          key: "addNewVariableQ",
-          value: function addNewVariableQ() {
-            this.target.variables[this.scope.varCounter] = {
-              type: 'queryVariable'
-            };
-            this.scope.varCounter += 1;
+            this.target.varCounter += 1;
             this.setSortable();
           }
         }, {
@@ -493,7 +471,6 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
               this.target.tagBoxes[queryId] = {};
             }
 
-            console.log("tag box counter " + this.target.tagBoxCounter);
             this.target.tagBoxes[queryId][this.target.tagBoxCounter] = {
               key: "",
               value: ""

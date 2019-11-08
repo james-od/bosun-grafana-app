@@ -13,7 +13,7 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
         var qbs = new QueryBuilderService();
         var myMock = jest.fn();
         var mocked_this = new myMock();
-        mocked_this.scope = {
+        mocked_this.target = {
           variables: {
             0: {
               type: "variable",
@@ -29,7 +29,7 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
         var qbs = new QueryBuilderService();
         var myMock = jest.fn();
         var mocked_this = new myMock();
-        mocked_this.scope = {
+        mocked_this.target = {
           variables: {
             0: {
               type: "variable",
@@ -55,7 +55,7 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
         var qbs = new QueryBuilderService();
         var myMock = jest.fn();
         var mocked_this = new myMock();
-        mocked_this.scope = {
+        mocked_this.target = {
           variables: {
             0: {
               type: "variable",
@@ -81,7 +81,7 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
         var qbs = new QueryBuilderService();
         var myMock = jest.fn();
         var mocked_this = new myMock();
-        mocked_this.scope = {
+        mocked_this.target = {
           variables: {
             0: {
               type: "variable",
@@ -95,16 +95,14 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
             },
             2: {
               type: "queryVariable",
-              value: {
-                queryVariableName: "$q",
-                queryFunction: "q",
-                metric: "example.metric",
-                queryAgg: "avg",
-                downsampleTime: "$time",
-                downsampleAgg: "avg",
-                endDuration: "2h",
-                startDuration: "$time"
-              }
+              inputValue: "$q",
+              queryFunction: "q",
+              metric: "example.metric",
+              queryAgg: "avg",
+              downsampleTime: "$time",
+              downsampleAgg: "avg",
+              endDuration: "2h",
+              startDuration: "$time"
             }
           },
           variableOrder: [],
@@ -118,6 +116,47 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
           }
         };
         expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe("q(\"avg:1h-avg:example.metric{}{tagName=hello}\", \"1h\", \"2h\")");
+      });
+      test('query types with `num` arg are built correctly', function () {
+        var qbs = new QueryBuilderService();
+        var myMock = jest.fn();
+        var mocked_this = new myMock();
+        mocked_this.target = {
+          variables: {
+            0: {
+              type: "variable",
+              inputName: "$time",
+              inputValue: "1h"
+            },
+            1: {
+              type: "variable",
+              inputName: "$tagValue",
+              inputValue: "hello"
+            },
+            2: {
+              type: "queryVariable",
+              inputValue: "$q",
+              queryFunction: "over",
+              metric: "example.metric",
+              queryAgg: "avg",
+              downsampleTime: "$time",
+              downsampleAgg: "avg",
+              duration: "7d",
+              num: "3",
+              period: "period"
+            }
+          },
+          variableOrder: [],
+          tagBoxes: {
+            2: {
+              0: {
+                key: "tagName",
+                value: "$tagValue"
+              }
+            }
+          }
+        };
+        expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe("over(\"avg:1h-avg:example.metric{}{tagName=hello}\", \"7d\", \"period\", 3)");
       });
     }
   };

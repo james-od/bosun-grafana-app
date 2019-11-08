@@ -41,10 +41,10 @@ System.register([], function (_export, _context) {
             //Dictionary doesn't guarantee ordering, so convert to array and sort by key
             var values = new Array();
 
-            if (_this.scope.variableOrder.length) {
-              for (var i = 0; i < _this.scope.variableOrder.length; i++) {
-                _this.target.variables[_this.scope.variableOrder[i].id]["id"] = _this.scope.variableOrder[i].id;
-                values.push(_this.target.variables[_this.scope.variableOrder[i].id]);
+            if (_this.target.variableOrder.length) {
+              for (var i = 0; i < _this.target.variableOrder.length; i++) {
+                _this.target.variables[_this.target.variableOrder[i].id]["id"] = _this.target.variableOrder[i].id;
+                values.push(_this.target.variables[_this.target.variableOrder[i].id]);
               }
             } else {
               for (var id in _this.target.variables) {
@@ -75,15 +75,25 @@ System.register([], function (_export, _context) {
                 substitutedFinalQuery = substitutedFinalQuery.split(value["inputValue"]).join(the_service.buildQueryVariable(value, value.id, _this));
               }
             });
-            _this.scope.subbedQuery = substitutedFinalQuery;
+            _this.target.subbedQuery = substitutedFinalQuery;
             return substitutedFinalQuery;
+          }
+        }, {
+          key: "addQueryArg",
+          value: function addQueryArg(constructedQuery, queryVariable, arg) {
+            if (queryVariable[arg]) {
+              if (arg == "num") {
+                constructedQuery += ', ' + queryVariable[arg];
+              } else {
+                constructedQuery += ', "' + queryVariable[arg] + '"';
+              }
+            }
+
+            return constructedQuery;
           }
         }, {
           key: "buildQueryVariable",
           value: function buildQueryVariable(queryVariable, id, _this) {
-            console.log(queryVariable);
-            console.log(id);
-            console.log(_this.scope);
             var constructedQuery = "";
 
             if (!queryVariable) {
@@ -151,30 +161,11 @@ System.register([], function (_export, _context) {
               constructedQuery += '{}"';
             }
 
-            if (queryVariable["startDuration"]) {
-              constructedQuery += ', "' + queryVariable["startDuration"] + '"';
-            }
-
-            if (queryVariable["endDuration"]) {
-              constructedQuery += ', "' + queryVariable["endDuration"] + '"';
-            }
-
-            if (queryVariable["duration"]) {
-              constructedQuery += ', "' + queryVariable["duration"] + '"';
-            }
-
-            if (queryVariable["period"]) {
-              constructedQuery += ', "' + queryVariable["period"] + '"';
-            }
-
-            if (queryVariable["num"]) {
-              constructedQuery += ', ' + queryVariable["num"];
-            }
-
-            if (queryVariable["funcName"]) {
-              constructedQuery += ', "' + queryVariable["funcName"] + '"';
-            }
-
+            var the_service = this;
+            var queryArgs = ["startDuration", "endDuration", "duration", "period", "funcName", "num"];
+            queryArgs.forEach(function (arg) {
+              constructedQuery = the_service.addQueryArg(constructedQuery, queryVariable, arg);
+            });
             constructedQuery += ")";
             console.log(constructedQuery);
             return constructedQuery;

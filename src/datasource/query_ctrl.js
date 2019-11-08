@@ -51,7 +51,9 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     if(!this.target.tagBoxes){
       this.target.tagBoxes = {};
     }
-    this.scope.varCounter = 0;
+    if(!this.target.varCounter){
+      this.target.varCounter = 0;
+    }
     if(!this.target.tagBoxCounter){
       this.target.tagBoxCounter = 0;
     }
@@ -192,8 +194,8 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
   }
 
   addNewVariable(type) {
-    this.target.variables[this.scope.varCounter] = {type: type};
-    this.scope.varCounter += 1;
+    this.target.variables[this.target.varCounter] = {type: type};
+    this.target.varCounter += 1;
     this.setSortable();
   }
 
