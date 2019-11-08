@@ -59,14 +59,19 @@
             <label class="gf-form-label query-keyword">
               Tags
             </label>
-            <label class="gf-form-label query-keyword"ng-click="ctrl.addTagBox(id)">
+            <label class="gf-form-label query-keyword" ng-click="ctrl.addTagBox(id)">
               +
             </label>
 
             <label
               class="gf-form-label" style="overflow: hidden; height: 85px" ng-repeat="(tagId, name) in ctrl.target.tagBoxes[id]">
               <input class="gf-form-input" style="float:left" ng-model="ctrl.target.tagBoxes[id][tagId]['key']" ng-change="ctrl.editTagBox()" rows="1" spellcheck="false" placeholder="enter tag key" data-min-length=0 data-items=150>
-              <input class="gf-form-input" style="float: left" ng-model="ctrl.target.tagBoxes[id][tagId]['value']" ng-change="ctrl.editTagBox()" rows="1" spellcheck="false" placeholder="enter tag value" data-min-length=0 data-items=150>
+              <div class="gf-form" style="width:80%;align-items:flex-start;">
+                <input class="gf-form-input" style="float: left" ng-model="ctrl.target.tagBoxes[id][tagId]['value']" ng-change="ctrl.editTagBox()" rows="1" spellcheck="false" placeholder="enter tag value" data-min-length=0 data-items=150>
+                <button class="gf-form-label" ng-click="ctrl.deleteTag(id, tagId)">
+                  -
+                </button>
+              </div>
             </label>
           </div>
           <div class="gf-form" style="width:80%;align-items:flex-start;" ng-query-ctrl="ctrl">
@@ -141,7 +146,7 @@
               data-min-length=0 data-items=15 ng-change="ctrl.updateFinalQuery(ctrl.target.finalQuery)" ng-click="ctrl.updateFinalQuery(ctrl.target.finalQuery)">
          </textarea>
   </div>
-  <label class="gf-form-label">
+  <label class="gf-form-label" id="subbedQueryLabel">
     {{ctrl.target.subbedQuery}}
   </label>
 

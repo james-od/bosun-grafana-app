@@ -332,6 +332,14 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             }
           }
         }, {
+          key: "deleteTag",
+          value: function deleteTag(queryId, tagId) {
+            console.log("Delete tags, " + queryId + " " + tagId);
+            console.log(this.target.tagBoxes);
+            delete this.target.tagBoxes[queryId][tagId];
+            console.log(this.target.tagBoxes);
+          }
+        }, {
           key: "setSortable",
           value: function setSortable() {
             var el = document.getElementById('allVariables');

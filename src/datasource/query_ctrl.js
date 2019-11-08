@@ -64,6 +64,7 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     if(!this.target.variableOrder){
       this.target.variableOrder = [];
     }
+    console.log(this.target)
   }
 
   deleteVariable(id){
@@ -95,6 +96,13 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     for(var i=0; i<values.length; i++){
       this.target.variables[i] = values[i];
     }
+  }
+
+  deleteTag(queryId, tagId){
+    console.log("Delete tags, " + queryId + " " + tagId)
+    console.log(this.target.tagBoxes)
+    delete this.target.tagBoxes[queryId][tagId]
+    console.log(this.target.tagBoxes)
   }
 
   setSortable(){

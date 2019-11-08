@@ -77,7 +77,7 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
         };
         expect(qbs.substituteFinalQuery("$c", mocked_this)).toBe("11");
       });
-      test('reordered simple substitutions', function () {
+      test('Complex substitutions', function () {
         var qbs = new QueryBuilderService();
         var myMock = jest.fn();
         var mocked_this = new myMock();
@@ -116,6 +116,76 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
           }
         };
         expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe("q(\"avg:1h-avg:example.metric{}{tagName=hello}\", \"1h\", \"2h\")");
+      });
+      test('reordered complex substitution', function () {
+        var qbs = new QueryBuilderService();
+        var myMock = jest.fn();
+        var mocked_this = new myMock();
+        mocked_this.target = {
+          variables: {
+            0: {
+              type: "variable",
+              inputName: "$time",
+              inputValue: "1h"
+            },
+            1: {
+              type: "variable",
+              inputName: "$tagValue",
+              inputValue: "hello"
+            },
+            2: {
+              type: "queryVariable",
+              inputValue: "$q",
+              queryFunction: "q",
+              metric: "example.metric",
+              queryAgg: "avg",
+              downsampleTime: "$time",
+              downsampleAgg: "avg",
+              endDuration: "2h",
+              startDuration: "$time"
+            }
+          },
+          //Simpler than trying to mock HTMLCollection
+          variableOrder: [{
+            "id": 0
+          }, {
+            "id": 2
+          }, {
+            "id": 1
+          }],
+          tagBoxes: {
+            2: {
+              0: {
+                key: "tagName",
+                value: "$tagValue"
+              }
+            }
+          }
+        };
+        expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe("q(\"avg:1h-avg:example.metric{}{tagName=$tagValue}\", \"1h\", \"2h\")");
+      });
+      test('error case', function () {
+        var qbs = new QueryBuilderService();
+        var myMock = jest.fn();
+        var mocked_this = new myMock();
+        mocked_this.target = {
+          variables: {
+            0: {
+              type: "queryVariable",
+              inputValue: "$q",
+              queryFunction: undefined,
+              metric: "example.metric",
+              queryAgg: "avg",
+              downsampleTime: "$time",
+              downsampleAgg: "avg",
+              endDuration: "2h",
+              startDuration: "$time"
+            }
+          },
+          //Simpler than trying to mock HTMLCollection
+          variableOrder: []
+        };
+        expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe("q(\"avg:1h-avg:example.metric{}{tagName=$tagValue}\", \"1h\", \"2h\")");
       });
       test('query types with `num` arg are built correctly', function () {
         var qbs = new QueryBuilderService();

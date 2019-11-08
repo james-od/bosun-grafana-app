@@ -1,47 +1,62 @@
 export class QueryBuilderService {
 
-  constructor() {
+  buildWithProvidedOrdering(variableOrderLength, variables, variableOrder, values) {
+    for (var i = 0; i < variableOrderLength; i++) {
+      variables[variableOrder[i].id]["id"] = variableOrder[i].id;
+      values.push(variables[variableOrder[i].id]);
+    }
   }
 
-  substituteFinalQuery(finalQuery, _this) {
-    //Dictionary doesn't guarantee ordering, so convert to array and sort by key
-    var values = new Array();
-    if (_this.target.variableOrder.length) {
-      for (var i = 0; i < _this.target.variableOrder.length; i++) {
-        _this.target.variables[_this.target.variableOrder[i].id]["id"] = _this.target.variableOrder[i].id
-        values.push(_this.target.variables[_this.target.variableOrder[i].id])
-      }
-    } else {
-      for (var id in _this.target.variables) {
-        if (_this.target.variables.hasOwnProperty(id)) {
-          _this.target.variables[id]["id"] = id
-          values.push(_this.target.variables[id])
-        }
+  buildWithDefaultOrdering(variables, values){
+    for (var id in variables) {
+      if (variables.hasOwnProperty(id)) {
+        variables[id]["id"] = id;
+        values.push(variables[id]);
       }
     }
-    values.sort()
+  }
+
+  variableIsValid(value){
+    return value["inputName"] && value["inputName"].startsWith("$")
+  }
+
+  substituteVariable(queryString, matching, replacement){
+    return queryString.split(matching).join(replacement);
+  }
+
+  substituteFinalQuery(finalQuery, controller) {
+    //Dictionary doesn't guarantee ordering, so convert to array and sort by key
+    var orderedVariablesList = [];
+    const variables = controller.target.variables;
+    const variableOrder = controller.target.variableOrder;
+    const variableOrderLength = variableOrder.length;
+    if (variableOrderLength) {
+      this.buildWithProvidedOrdering(variableOrderLength, variables, variableOrder, orderedVariablesList);
+    } else {
+      this.buildWithDefaultOrdering(variables, orderedVariablesList);
+    }
+    orderedVariablesList.sort();
     //Work upwards
-    values = values.reverse()
+    orderedVariablesList = orderedVariablesList.reverse();
 
-    var the_service = this
+    var the_service = this;
 
-    var substitutedFinalQuery = finalQuery
-    values.forEach(function (value) {
-      if (value.type == "variable") {
-
-        if (value["inputName"] && value["inputName"].startsWith("$")) {
-          if (value["inputValue"] == undefined) {
-            substitutedFinalQuery = substitutedFinalQuery.split(value["inputName"]).join("");
+    var substitutedFinalQuery = finalQuery;
+    orderedVariablesList.forEach(function (value) {
+      if (value.type === "variable") {
+        if (the_service.variableIsValid(value)) {
+          if (value["inputValue"] === undefined) {
+            substitutedFinalQuery = the_service.substituteVariable(substitutedFinalQuery, value["inputName"], "");
           } else {
-            substitutedFinalQuery = substitutedFinalQuery.split(value["inputName"]).join(value["inputValue"]);
+            substitutedFinalQuery = the_service.substituteVariable(substitutedFinalQuery, value["inputName"], value["inputValue"]);
           }
         }
       }
-      if (value.type == "queryVariable") {
-        substitutedFinalQuery = substitutedFinalQuery.split(value["inputValue"]).join(the_service.buildQueryVariable(value, value.id, _this));
+      if (value.type === "queryVariable") {
+        substitutedFinalQuery = the_service.substituteVariable(substitutedFinalQuery, value["inputValue"], the_service.buildQueryVariable(value, value.id, controller));
       }
     });
-    _this.target.subbedQuery = substitutedFinalQuery;
+    controller.target.subbedQuery = substitutedFinalQuery;
     return substitutedFinalQuery;
   }
 
@@ -56,22 +71,17 @@ export class QueryBuilderService {
     return constructedQuery
   }
 
-  buildQueryVariable(queryVariable, id, _this) {
+  buildQueryVariable(queryVariable, id, controller) {
+    console.log(queryVariable)
 
     var constructedQuery = "";
-    if(!queryVariable){
-      throw new ReferenceError("No query parameters found")
-    }
-    if(queryVariable["queryFunction"]){
-      constructedQuery += queryVariable["queryFunction"] + '("'
-    }else{
-      throw new ReferenceError("Query function not set")
-    }
-    if(queryVariable["queryAgg"]){
-      constructedQuery += queryVariable["queryAgg"] + ":"
-    }else{
-      throw new ReferenceError("Query aggregator not set")
-    }
+    if(!queryVariable){throw new ReferenceError("No query parameters found")}
+    if(!queryVariable["queryFunction"]){throw new ReferenceError("Query function not set")}
+    if(!queryVariable["queryAgg"]){throw new ReferenceError("Query aggregator not set")}
+    if(!queryVariable["metric"]){throw new ReferenceError("Query metric not set")}
+
+    constructedQuery += queryVariable["queryFunction"] + '("';
+    constructedQuery += queryVariable["queryAgg"] + ":";
     if(queryVariable["downsampleTime"]){
       constructedQuery += queryVariable["downsampleTime"];
       if(queryVariable["downsampleAgg"]){
@@ -84,25 +94,21 @@ export class QueryBuilderService {
     if(queryVariable["conversionFlag"]){
       constructedQuery += ":" + queryVariable["conversionFlag"]
     }
-    if(queryVariable["metric"]){
-      constructedQuery += ":" + queryVariable["metric"] + "{"
-    }else{
-      throw new ReferenceError("Query metric not set")
-    }
+    constructedQuery += ":" + queryVariable["metric"] + "{";
     if(queryVariable["metricTags"]){
       constructedQuery += queryVariable["metricTags"]
     }
     constructedQuery += "}";
-    if(_this.target.tagBoxes[id]){
+    if(controller.target.tagBoxes[id]){
       var onFirstTag = true;
 
       constructedQuery += "{";
-      for (var tagMapping in _this.target.tagBoxes[id]) {
-        if (_this.target.tagBoxes[id].hasOwnProperty(tagMapping)) {
+      for (var tagMapping in controller.target.tagBoxes[id]) {
+        if (controller.target.tagBoxes[id].hasOwnProperty(tagMapping)) {
           if(!onFirstTag){
             constructedQuery += ", "
           }else{onFirstTag = false;}
-          constructedQuery += _this.target.tagBoxes[id][tagMapping]["key"] + "=" + _this.target.tagBoxes[id][tagMapping]["value"]
+          constructedQuery += controller.target.tagBoxes[id][tagMapping]["key"] + "=" + controller.target.tagBoxes[id][tagMapping]["value"]
         }
       }
       constructedQuery += '}"'

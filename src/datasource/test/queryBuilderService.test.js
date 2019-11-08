@@ -43,7 +43,7 @@ test('multiple nested substitutions', () => {
   expect(qbs.substituteFinalQuery("$c", mocked_this)).toBe("11");
 });
 
-test('reordered simple substitutions', () => {
+test('Complex substitutions', () => {
   var qbs = new QueryBuilderService();
   const myMock = jest.fn()
   const mocked_this = new myMock();
@@ -64,6 +64,51 @@ test('reordered simple substitutions', () => {
   expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe(
     "q(\"avg:1h-avg:example.metric{}{tagName=hello}\", \"1h\", \"2h\")"
   );
+});
+
+test('reordered complex substitution', () => {
+  var qbs = new QueryBuilderService();
+  const myMock = jest.fn()
+  const mocked_this = new myMock();
+  mocked_this.target = {
+    variables: {
+      0: {type: "variable", inputName: "$time", inputValue: "1h"},
+      1: {type: "variable", inputName: "$tagValue", inputValue: "hello"},
+      2: {
+        type: "queryVariable", inputValue: "$q", queryFunction: "q", metric: "example.metric", queryAgg: "avg",
+        downsampleTime: "$time", downsampleAgg: "avg", endDuration: "2h", startDuration:"$time"
+      }
+    },
+    //Simpler than trying to mock HTMLCollection
+    variableOrder: [{"id": 0}, {"id": 2}, {"id": 1}],
+    tagBoxes: {
+      2: {0: {key: "tagName", value: "$tagValue"}}
+    }
+  };
+  expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe(
+    "q(\"avg:1h-avg:example.metric{}{tagName=$tagValue}\", \"1h\", \"2h\")"
+  );
+});
+
+test('error case - query function not set', () => {
+  var qbs = new QueryBuilderService();
+  const myMock = jest.fn()
+  const mocked_this = new myMock();
+  mocked_this.target = {
+    variables: {
+      0: {
+        type: "queryVariable", inputValue: "$q", queryFunction: undefined, metric: "example.metric", queryAgg: "avg",
+        downsampleTime: "$time", downsampleAgg: "avg", endDuration: "2h", startDuration:"$time"
+      }
+    },
+    //Simpler than trying to mock HTMLCollection
+    variableOrder: []
+  };
+  try{
+    qbs.substituteFinalQuery("$q", mocked_this);
+  }catch (e) {
+    expect(e.message).toBe("Query function not set");
+  }
 });
 
 test('query types with `num` arg are built correctly', () => {
