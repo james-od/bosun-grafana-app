@@ -4,7 +4,7 @@ test('simple substitution in final query', () => {
   var qbs = new QueryBuilderService();
   const myMock = jest.fn()
   const mocked_this = new myMock();
-  mocked_this.scope = {
+  mocked_this.target = {
     variables: {
       0: {type: "variable", inputName: "$a", inputValue: "1"}
     },
@@ -17,7 +17,7 @@ test('multiple simple substitutions in final query', () => {
   var qbs = new QueryBuilderService();
   const myMock = jest.fn()
   const mocked_this = new myMock();
-  mocked_this.scope = {
+  mocked_this.target = {
     variables: {
       0: {type: "variable", inputName: "$a", inputValue: "1"},
       1: {type: "variable", inputName: "$b", inputValue: "2"},
@@ -32,7 +32,7 @@ test('multiple nested substitutions', () => {
   var qbs = new QueryBuilderService();
   const myMock = jest.fn()
   const mocked_this = new myMock();
-  mocked_this.scope = {
+  mocked_this.target = {
     variables: {
       0: {type: "variable", inputName: "$a", inputValue: "1"},
       1: {type: "variable", inputName: "$b", inputValue: "$a"},
@@ -47,16 +47,13 @@ test('reordered simple substitutions', () => {
   var qbs = new QueryBuilderService();
   const myMock = jest.fn()
   const mocked_this = new myMock();
-  mocked_this.scope = {
+  mocked_this.target = {
     variables: {
       0: {type: "variable", inputName: "$time", inputValue: "1h"},
       1: {type: "variable", inputName: "$tagValue", inputValue: "hello"},
       2: {
-        type: "queryVariable",
-        value: {
-          queryVariableName: "$q", queryFunction: "q", metric: "example.metric", queryAgg: "avg",
-          downsampleTime: "$time", downsampleAgg: "avg", endDuration: "2h", startDuration:"$time"
-        }
+        type: "queryVariable", inputValue: "$q", queryFunction: "q", metric: "example.metric", queryAgg: "avg",
+        downsampleTime: "$time", downsampleAgg: "avg", endDuration: "2h", startDuration:"$time"
       }
     },
     variableOrder: [],
@@ -66,6 +63,29 @@ test('reordered simple substitutions', () => {
   };
   expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe(
     "q(\"avg:1h-avg:example.metric{}{tagName=hello}\", \"1h\", \"2h\")"
+  );
+});
+
+test('query types with `num` arg are built correctly', () => {
+  var qbs = new QueryBuilderService();
+  const myMock = jest.fn()
+  const mocked_this = new myMock();
+  mocked_this.target = {
+    variables: {
+      0: {type: "variable", inputName: "$time", inputValue: "1h"},
+      1: {type: "variable", inputName: "$tagValue", inputValue: "hello"},
+      2: {
+        type: "queryVariable", inputValue: "$q", queryFunction: "over", metric: "example.metric", queryAgg: "avg",
+        downsampleTime: "$time", downsampleAgg: "avg", duration: "7d", num: "3", period: "period"
+      }
+    },
+    variableOrder: [],
+    tagBoxes: {
+      2: {0: {key: "tagName", value: "$tagValue"}}
+    }
+  };
+  expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe(
+    "over(\"avg:1h-avg:example.metric{}{tagName=hello}\", \"7d\", \"period\", 3)"
   );
 });
 

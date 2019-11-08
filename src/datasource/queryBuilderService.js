@@ -6,16 +6,16 @@ export class QueryBuilderService {
   substituteFinalQuery(finalQuery, _this) {
     //Dictionary doesn't guarantee ordering, so convert to array and sort by key
     var values = new Array();
-    if (_this.scope.variableOrder.length) {
-      for (var i = 0; i < _this.scope.variableOrder.length; i++) {
-        _this.scope.variables[_this.scope.variableOrder[i].id]["id"] = _this.scope.variableOrder[i].id
-        values.push(_this.scope.variables[_this.scope.variableOrder[i].id])
+    if (_this.target.variableOrder.length) {
+      for (var i = 0; i < _this.target.variableOrder.length; i++) {
+        _this.target.variables[_this.target.variableOrder[i].id]["id"] = _this.target.variableOrder[i].id
+        values.push(_this.target.variables[_this.target.variableOrder[i].id])
       }
     } else {
-      for (var id in _this.scope.variables) {
-        if (_this.scope.variables.hasOwnProperty(id)) {
-          _this.scope.variables[id]["id"] = id
-          values.push(_this.scope.variables[id])
+      for (var id in _this.target.variables) {
+        if (_this.target.variables.hasOwnProperty(id)) {
+          _this.target.variables[id]["id"] = id
+          values.push(_this.target.variables[id])
         }
       }
     }
@@ -38,18 +38,26 @@ export class QueryBuilderService {
         }
       }
       if (value.type == "queryVariable") {
-        substitutedFinalQuery = substitutedFinalQuery.split(value["inputValue"]).join(the_service.buildQueryVariable(value, value.id, _this.scope));
+        substitutedFinalQuery = substitutedFinalQuery.split(value["inputValue"]).join(the_service.buildQueryVariable(value, value.id, _this));
       }
     });
-    _this.scope.subbedQuery = substitutedFinalQuery;
+    _this.target.subbedQuery = substitutedFinalQuery;
     return substitutedFinalQuery;
   }
 
-  buildQueryVariable(queryVariable, id, scope) {
+  addQueryArg(constructedQuery, queryVariable, arg){
+    if(queryVariable[arg]){
+      if(arg == "num"){
+        constructedQuery += ', ' + queryVariable[arg]
+      }else{
+        constructedQuery += ', "' + queryVariable[arg] + '"'
+      }
+    }
+    return constructedQuery
+  }
 
-    console.log(queryVariable)
-    console.log(id)
-    console.log(scope)
+  buildQueryVariable(queryVariable, id, _this) {
+
     var constructedQuery = "";
     if(!queryVariable){
       throw new ReferenceError("No query parameters found")
@@ -65,7 +73,7 @@ export class QueryBuilderService {
       throw new ReferenceError("Query aggregator not set")
     }
     if(queryVariable["downsampleTime"]){
-      constructedQuery += queryVariable["downsampleTime"]
+      constructedQuery += queryVariable["downsampleTime"];
       if(queryVariable["downsampleAgg"]){
         constructedQuery += "-" + queryVariable["downsampleAgg"]
       }
@@ -84,43 +92,30 @@ export class QueryBuilderService {
     if(queryVariable["metricTags"]){
       constructedQuery += queryVariable["metricTags"]
     }
-    constructedQuery += "}"
-    if(scope.tagBoxes[id]){
-      var onFirstTag = true
+    constructedQuery += "}";
+    if(_this.target.tagBoxes[id]){
+      var onFirstTag = true;
 
-      constructedQuery += "{"
-      for (var tagMapping in scope.tagBoxes[id]) {
-        if (scope.tagBoxes[id].hasOwnProperty(tagMapping)) {
+      constructedQuery += "{";
+      for (var tagMapping in _this.target.tagBoxes[id]) {
+        if (_this.target.tagBoxes[id].hasOwnProperty(tagMapping)) {
           if(!onFirstTag){
             constructedQuery += ", "
           }else{onFirstTag = false;}
-          constructedQuery += scope.tagBoxes[id][tagMapping]["key"] + "=" + scope.tagBoxes[id][tagMapping]["value"]
+          constructedQuery += _this.target.tagBoxes[id][tagMapping]["key"] + "=" + _this.target.tagBoxes[id][tagMapping]["value"]
         }
       }
       constructedQuery += '}"'
     }else{
       constructedQuery += '{}"'
     }
-    if(queryVariable["startDuration"]){
-      constructedQuery += ', "' + queryVariable["startDuration"] + '"'
-    }
-    if(queryVariable["endDuration"]){
-      constructedQuery += ', "' + queryVariable["endDuration"] + '"'
-    }
-    if(queryVariable["duration"]){
-      constructedQuery += ', "' + queryVariable["duration"] + '"'
-    }
-    if(queryVariable["period"]){
-      constructedQuery += ', "' + queryVariable["period"] + '"'
-    }
-    if(queryVariable["num"]){
-      constructedQuery += ', ' + queryVariable["num"]
-    }
-    if(queryVariable["funcName"]){
-      constructedQuery += ', "' + queryVariable["funcName"] + '"'
-    }
+    var the_service = this;
+    var queryArgs = ["startDuration", "endDuration", "duration", "period", "funcName", "num"]
+    queryArgs.forEach(function (arg) {
+      constructedQuery = the_service.addQueryArg(constructedQuery, queryVariable, arg);
+    });
     constructedQuery += ")";
-    console.log(constructedQuery)
+    console.log(constructedQuery);
     return constructedQuery;
   }
 }

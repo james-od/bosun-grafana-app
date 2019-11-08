@@ -43,14 +43,14 @@ System.register([], function (_export, _context) {
 
             if (_this.scope.variableOrder.length) {
               for (var i = 0; i < _this.scope.variableOrder.length; i++) {
-                _this.scope.variables[_this.scope.variableOrder[i].id]["id"] = _this.scope.variableOrder[i].id;
-                values.push(_this.scope.variables[_this.scope.variableOrder[i].id]);
+                _this.target.variables[_this.scope.variableOrder[i].id]["id"] = _this.scope.variableOrder[i].id;
+                values.push(_this.target.variables[_this.scope.variableOrder[i].id]);
               }
             } else {
-              for (var id in _this.scope.variables) {
-                if (_this.scope.variables.hasOwnProperty(id)) {
-                  _this.scope.variables[id]["id"] = id;
-                  values.push(_this.scope.variables[id]);
+              for (var id in _this.target.variables) {
+                if (_this.target.variables.hasOwnProperty(id)) {
+                  _this.target.variables[id]["id"] = id;
+                  values.push(_this.target.variables[id]);
                 }
               }
             }
@@ -72,7 +72,7 @@ System.register([], function (_export, _context) {
               }
 
               if (value.type == "queryVariable") {
-                substitutedFinalQuery = substitutedFinalQuery.split(value["inputValue"]).join(the_service.buildQueryVariable(value, value.id, _this.scope));
+                substitutedFinalQuery = substitutedFinalQuery.split(value["inputValue"]).join(the_service.buildQueryVariable(value, value.id, _this));
               }
             });
             _this.scope.subbedQuery = substitutedFinalQuery;
@@ -80,10 +80,10 @@ System.register([], function (_export, _context) {
           }
         }, {
           key: "buildQueryVariable",
-          value: function buildQueryVariable(queryVariable, id, scope) {
+          value: function buildQueryVariable(queryVariable, id, _this) {
             console.log(queryVariable);
             console.log(id);
-            console.log(scope);
+            console.log(_this.scope);
             var constructedQuery = "";
 
             if (!queryVariable) {
@@ -130,19 +130,19 @@ System.register([], function (_export, _context) {
 
             constructedQuery += "}";
 
-            if (scope.tagBoxes[id]) {
+            if (_this.target.tagBoxes[id]) {
               var onFirstTag = true;
               constructedQuery += "{";
 
-              for (var tagMapping in scope.tagBoxes[id]) {
-                if (scope.tagBoxes[id].hasOwnProperty(tagMapping)) {
+              for (var tagMapping in _this.target.tagBoxes[id]) {
+                if (_this.target.tagBoxes[id].hasOwnProperty(tagMapping)) {
                   if (!onFirstTag) {
                     constructedQuery += ", ";
                   } else {
                     onFirstTag = false;
                   }
 
-                  constructedQuery += scope.tagBoxes[id][tagMapping]["key"] + "=" + scope.tagBoxes[id][tagMapping]["value"];
+                  constructedQuery += _this.target.tagBoxes[id][tagMapping]["key"] + "=" + _this.target.tagBoxes[id][tagMapping]["value"];
                 }
               }
 

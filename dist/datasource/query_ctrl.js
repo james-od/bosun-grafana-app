@@ -126,10 +126,8 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
           _this2.addTagBox = _this2.addTagBox.bind(_assertThisInitialized(_this2));
           _this2.filterTypes = ["Group By", "Filter"];
 
-          if (_this2.target.variables) {
-            _this2.scope.variables = _this2.target.variables;
-          } else {
-            _this2.scope.variables = {};
+          if (!_this2.target.variables) {
+            _this2.target.variables = {};
           }
 
           _this2.scope.aggOptions = [{
@@ -274,10 +272,8 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
           }];
           _this2.scope.suggestions = [];
 
-          if (_this2.target.tagBoxes) {
-            _this2.scope.tagBoxes = _this2.target.tagBoxes;
-          } else {
-            _this2.scope.tagBoxes = {};
+          if (!_this2.target.tagBoxes) {
+            _this2.target.tagBoxes = {};
           }
 
           _this2.scope.varCounter = 0;
@@ -286,7 +282,10 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             _this2.target.tagBoxCounter = 0;
           }
 
-          _this2.scope.finalQuery = "";
+          if (!_this2.target.finalQuery) {
+            _this2.target.finalQuery = "";
+          }
+
           _this2.scope.subbedQuery = "";
           _this2.scope.variableOrder = [];
           console.log("Target");
@@ -300,7 +299,7 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
           key: "deleteVariable",
           value: function deleteVariable(id) {
             //delete variable
-            delete this.scope.variables[id]; //delete corresponding id in variableOrder
+            delete this.target.variables[id]; //delete corresponding id in variableOrder
 
             for (var i = 0; i < this.scope.variableOrder.length; i++) {
               if (this.scope.variableOrder[i].id == id) {
@@ -313,25 +312,25 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
 
             if (this.scope.variableOrder.length) {
               for (var i = 0; i < this.scope.variableOrder.length; i++) {
-                this.scope.variables[this.scope.variableOrder[i].id]["id"] = this.scope.variableOrder[i].id;
-                values.push(this.scope.variables[this.scope.variableOrder[i].id]);
+                this.target.variables[this.scope.variableOrder[i].id]["id"] = this.scope.variableOrder[i].id;
+                values.push(this.target.variables[this.scope.variableOrder[i].id]);
               }
             } else {
-              for (var id in this.scope.variables) {
-                if (this.scope.variables.hasOwnProperty(id)) {
-                  this.scope.variables[id]["id"] = id;
-                  values.push(this.scope.variables[id]);
+              for (var id in this.target.variables) {
+                if (this.target.variables.hasOwnProperty(id)) {
+                  this.target.variables[id]["id"] = id;
+                  values.push(this.target.variables[id]);
                 }
               }
             }
 
-            this.scope.variables = {};
+            this.target.variables = {};
 
             for (var i = 0; i < values.length; i++) {
-              this.scope.variables[i] = values[i];
+              this.target.variables[i] = values[i];
             }
 
-            this.target.variables = this.scope.variables;
+            this.target.variables = this.target.variables;
           }
         }, {
           key: "setSortable",
@@ -453,69 +452,53 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
         }, {
           key: "updateFinalQuery",
           value: function updateFinalQuery(finalQuery) {
-            this.target.variables = this.scope.variables;
             console.log(this.target);
             var qbs = new QueryBuilderService();
             this.target.expr = qbs.substituteFinalQuery(finalQuery, this);
             this.panelCtrl.refresh();
-            this.scope.finalQuery = finalQuery;
+            this.target.finalQuery = finalQuery;
             return qbs.substituteFinalQuery(finalQuery, this);
           }
         }, {
           key: "addVariableName",
           value: function addVariableName(inputName, id) {
-            if (this.scope.variables[id]) {
-              this.scope.variables[id]["name"] = inputName;
+            if (this.target.variables[id]) {
+              this.target.variables[id]["name"] = inputName;
             } else {
               throw new ReferenceError("When trying to add name the requested variable id could not be found");
             }
-
-            this.target.variables = this.scope.variables;
           }
         }, {
           key: "addNewVariable",
           value: function addNewVariable() {
-            this.scope.variables[this.scope.varCounter] = {
+            this.target.variables[this.scope.varCounter] = {
               type: 'variable'
             };
             this.scope.varCounter += 1;
             this.setSortable();
-            this.target.variables = this.scope.variables;
           }
         }, {
           key: "addNewVariableQ",
           value: function addNewVariableQ() {
-            console.log(this.scope);
-            this.scope.variables[this.scope.varCounter] = {
+            this.target.variables[this.scope.varCounter] = {
               type: 'queryVariable'
             };
             this.scope.varCounter += 1;
             this.setSortable();
-            this.target.variables = this.scope.variables;
-          }
-        }, {
-          key: "substituteVariables",
-          value: function substituteVariables(finalQuery) {//TODO
-          }
-        }, {
-          key: "editTagBox",
-          value: function editTagBox() {
-            this.target.tagBoxes = this.scope.tagBoxes;
           }
         }, {
           key: "addTagBox",
           value: function addTagBox(queryId) {
-            if (!this.scope.tagBoxes[queryId]) {
-              this.scope.tagBoxes[queryId] = {};
+            if (!this.target.tagBoxes[queryId]) {
+              this.target.tagBoxes[queryId] = {};
             }
 
             console.log("tag box counter " + this.target.tagBoxCounter);
-            this.scope.tagBoxes[queryId][this.target.tagBoxCounter] = {
+            this.target.tagBoxes[queryId][this.target.tagBoxCounter] = {
               key: "",
               value: ""
             };
             this.target.tagBoxCounter += 1;
-            this.target.tagBoxes = this.scope.tagBoxes;
           }
         }, {
           key: "addSuggest",
