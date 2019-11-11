@@ -1,0 +1,30 @@
+clone:
+  clone:
+    image: 325714046698.dkr.ecr.eu-west-1.amazonaws.com/dmx/drone-git:next
+    pull: true
+
+pipeline:
+
+  compress:
+    image: 325714046698.dkr.ecr.eu-west-1.amazonaws.com/skyscanner/shell-ci:1.0.0
+    pull: true
+    commands: tar czf bosun-grafana-app-${DRONE_BRANCH}-${DRONE_BUILD_NUMBER}.tar.gz dist
+   
+
+  s3-sandbox:
+    image: plugins/s3
+    region: "eu-west-1"
+    bucket: "skyscanner-sandbox-skymetrics-deploymentsupport"
+    secrets:
+    - source: access_key_sandbox
+      target: aws_access_key_id
+    - source: secret_key_sandbox
+      target: aws_secret_access_key
+    source: bosun-grafana-app-${DRONE_BRANCH}-${DRONE_BUILD_NUMBER}.tar.gz
+    target: /artifacts/bosun-grafana-app/
+    when:
+      repo: jamesodonnell/bosun-grafana-app
+      event: push
+      branch:
+        exclude: [ master ]
+
