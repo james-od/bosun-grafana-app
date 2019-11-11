@@ -69,6 +69,28 @@ The complete incident body can be shown without ever leaving the dashboard:
 Besides Grafana, the plugin just needs a running Bosun instance. Because Bosun doesn't have support for [CORS headers](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing), it may be easier to make it work in proxy mode.
 Bosun also needs a ElasticSearch backend in order for its annotations subsystem to work.
 
+## Query Templating
+
+For users unfamiliar with Bosun syntax, query template blocks can be used. Simply click the `Query +` button and a
+new query block will appear.
+  
+![Query template example](src/img/queryTemplateExample.png)
+
+In the above example the query 
+
+`over("zimsum:1h-zimsum-zero:gap.redirects.summary{}{country=$Country}", "$start", "7d", 3)`
+
+is templated. The variable name is given as `$q` - variable names must be prepended with a dollar. This can then be
+called in the `Final Query` section.  
+
+If we wished to also make `$time` a templated variable then we could click the `Var +` button. This adds a new simple 
+variable block at the bottom. Blocks are read and their variables substituted in order, so to use this new `$time` block we 
+can click and drag it above the query block.
+
+![Click and Drag Ex](src/img/clickAndDrag.gif)
+
+
+ 
 ## Local Development
 
 Clone Grafana. 
