@@ -69,23 +69,53 @@ The complete incident body can be shown without ever leaving the dashboard:
 Besides Grafana, the plugin just needs a running Bosun instance. Because Bosun doesn't have support for [CORS headers](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing), it may be easier to make it work in proxy mode.
 Bosun also needs a ElasticSearch backend in order for its annotations subsystem to work.
 
+## Query Templating
+
+For users unfamiliar with Bosun syntax, query template blocks can be used. Simply click the `Query +` button and a
+new query block will appear.
+  
+![Query template example](src/img/queryTemplateExample.png)
+
+In the above example the query 
+
+`over("zimsum:1h-zimsum-zero:gap.redirects.summary{}{country=$Country}", "$start", "7d", 3)`
+
+is templated. The variable name is given as `$q` - variable names must be prepended with a dollar. This can then be
+called in the `Final Query` section.  
+
+If we wished to also make `$time` a templated variable then we could click the `Var +` button. This adds a new simple 
+variable block at the bottom. Blocks are read and their variables substituted in order, so to use this new `$time` block we 
+can click and drag it above the query block.
+
+![Click and Drag Ex](src/img/clickAndDrag.gif)
+
+
+ 
 ## Local Development
 
-Clone this repo into plugins folder.
-`npm install -g grunt-cli`
+Clone Grafana. 
 
-Add the following to datasources.yml to provide grafana with a suitable mock datasource:
+Clone this repo into Grafana's plugins folder.
+
+Run `npm install -g grunt-cli`
+
+Add the following to datasources.yml in Grafana to provide the plugin with a suitable mock datasource:
 ```
-  - name: gdev-bosun
+  - name: Bosun Query-prod
     type: bosun-datasource
     access: proxy
-    url: http://localhost:10000
+    url: https://bosun-query.slingshot.eu-west-1.prod.aws.skyscnr.com
     jsonData:
       openTSDBUrl: http://localhost:8010/proxy
 ```
 Autocompletion suggestions for metrics are taken from the openTSDBUrl parameter provided. To prevent CORS errors, run the following:
+
 `lcp --proxyUrl http://opentsdb.skymetrics.prod.skyscanner.local:4242`
+
 This redirects requests to the production opentsdb endpoint from the proxy url parameter provided above. 
 
-Ensure front end assets have been built with `yarn start` then start Grafana `./bin/darwin-amd64/grafana-server`
-Add a new dashboard and select the `gdev-bosun` datasource.
+Ensure front end assets have been built with `yarn start` then start Grafana `./bin/darwin-amd64/grafana-server`.
+
+Add a new dashboard and select the `Bosun Query-prod` datasource.
+
+To run tests, `npm run test`.
