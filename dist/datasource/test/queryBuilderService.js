@@ -117,6 +117,30 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
         };
         expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe("q(\"avg:1h-avg:example.metric{}{tagName=hello}\", \"1h\", \"2h\")");
       });
+      test('Flags', function () {
+        var qbs = new QueryBuilderService();
+        var myMock = jest.fn();
+        var mocked_this = new myMock();
+        mocked_this.target = {
+          variables: {
+            0: {
+              type: "queryVariable",
+              inputValue: "$q",
+              queryFunction: "q",
+              flags: "rate{counter,,1}",
+              metric: "example.metric",
+              queryAgg: "avg",
+              downsampleTime: "$time",
+              downsampleAgg: "avg",
+              endDuration: "2h",
+              startDuration: "$time"
+            }
+          },
+          variableOrder: [],
+          tagBoxes: {}
+        };
+        expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe("q(\"avg:$time-avg:rate{counter,,1}:example.metric{}{}\", \"$time\", \"2h\")");
+      });
       test('reordered complex substitution', function () {
         var qbs = new QueryBuilderService();
         var myMock = jest.fn();
@@ -164,7 +188,7 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
         };
         expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe("q(\"avg:1h-avg:example.metric{}{tagName=$tagValue}\", \"1h\", \"2h\")");
       });
-      test('error case', function () {
+      test('error case - query function not set', function () {
         var qbs = new QueryBuilderService();
         var myMock = jest.fn();
         var mocked_this = new myMock();
@@ -185,7 +209,12 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
           //Simpler than trying to mock HTMLCollection
           variableOrder: []
         };
-        expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe("q(\"avg:1h-avg:example.metric{}{tagName=$tagValue}\", \"1h\", \"2h\")");
+
+        try {
+          qbs.substituteFinalQuery("$q", mocked_this);
+        } catch (e) {
+          expect(e.message).toBe("Query function not set");
+        }
       });
       test('query types with `num` arg are built correctly', function () {
         var qbs = new QueryBuilderService();

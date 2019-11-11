@@ -66,6 +66,24 @@ test('Complex substitutions', () => {
   );
 });
 
+test('Flags', () => {
+  var qbs = new QueryBuilderService();
+  const myMock = jest.fn()
+  const mocked_this = new myMock();
+  mocked_this.target = {
+    variables: {
+      0: {
+        type: "queryVariable", inputValue: "$q", queryFunction: "q", flags: "rate{counter,,1}", metric: "example.metric", queryAgg: "avg",
+        downsampleTime: "$time", downsampleAgg: "avg", endDuration: "2h", startDuration:"$time"
+      }
+    },
+    variableOrder: [],
+    tagBoxes: {}
+  };
+  expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe(
+    "q(\"avg:$time-avg:rate{counter,,1}:example.metric{}{}\", \"$time\", \"2h\")"
+  );
+});
 test('reordered complex substitution', () => {
   var qbs = new QueryBuilderService();
   const myMock = jest.fn()

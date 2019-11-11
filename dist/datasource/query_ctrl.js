@@ -287,10 +287,15 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             _this2.target.finalQuery = "";
           }
 
+          console.log(_this2.target.finalQuery);
           _this2.target.subbedQuery = "";
 
           if (!_this2.target.variableOrder) {
             _this2.target.variableOrder = [];
+          }
+
+          if (!_this2.target.flags) {
+            _this2.target.flags = "";
           }
 
           console.log(_this2.target);

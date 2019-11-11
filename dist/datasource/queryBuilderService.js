@@ -155,6 +155,10 @@ System.register([], function (_export, _context) {
               constructedQuery += ":" + queryVariable["conversionFlag"];
             }
 
+            if (queryVariable["flags"]) {
+              constructedQuery += ":" + queryVariable["flags"];
+            }
+
             constructedQuery += ":" + queryVariable["metric"] + "{";
 
             if (queryVariable["metricTags"]) {

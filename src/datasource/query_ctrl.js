@@ -60,9 +60,13 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     if(!this.target.finalQuery){
       this.target.finalQuery = "";
     }
+    console.log(this.target.finalQuery)
     this.target.subbedQuery = "";
     if(!this.target.variableOrder){
       this.target.variableOrder = [];
+    }
+    if(!this.target.flags){
+      this.target.flags = "";
     }
     console.log(this.target)
   }

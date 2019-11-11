@@ -46,6 +46,14 @@
           </div>
           <div class="gf-form" style="width:80%;align-items:flex-start;">
             <label class="gf-form-label query-keyword">
+              Flags
+            </label>
+            <input list="responseSuggestions"
+                   class="gf-form-input" rows="1" ng-model="ctrl.target.variables[id].flags" onspellcheck="false" placeholder="rate" data-min-length=0 data-items=150>
+            </input>
+          </div>
+          <div class="gf-form" style="width:80%;align-items:flex-start;">
+            <label class="gf-form-label query-keyword">
               Metric
             </label>
             <input list="responseSuggestions"
@@ -142,12 +150,12 @@
     <label class="gf-form-label query-keyword">
       Final Query
     </label>
-    <textarea class="gf-form-input" rows="1" ng-model="ctrl.target.finalQuery" spellcheck='false' placeholder='$query'
+    <textarea class="gf-form-input" rows="3" ng-model="ctrl.target.finalQuery" spellcheck='false' placeholder='$query'
               data-min-length=0 data-items=15 ng-change="ctrl.updateFinalQuery(ctrl.target.finalQuery)" ng-click="ctrl.updateFinalQuery(ctrl.target.finalQuery)">
          </textarea>
   </div>
   <label class="gf-form-label" id="subbedQueryLabel">
-    {{ctrl.target.subbedQuery}}
+    <!--{{ctrl.target.subbedQuery}}-->
   </label>
 
   </div>

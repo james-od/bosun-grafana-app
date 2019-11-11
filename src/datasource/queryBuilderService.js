@@ -94,6 +94,9 @@ export class QueryBuilderService {
     if(queryVariable["conversionFlag"]){
       constructedQuery += ":" + queryVariable["conversionFlag"]
     }
+    if(queryVariable["flags"]){
+      constructedQuery += ":" + queryVariable["flags"]
+    }
     constructedQuery += ":" + queryVariable["metric"] + "{";
     if(queryVariable["metricTags"]){
       constructedQuery += queryVariable["metricTags"]
