@@ -60,9 +60,25 @@ export class QueryBuilderService {
     return substitutedFinalQuery;
   }
 
-  addQueryArg(constructedQuery, queryVariable, arg){
+  addQueryArg(constructedQuery, queryFunction, queryVariable, arg){
+    if(queryFunction === "q" || queryFunction === "change" || queryFunction === "count"){
+      if(arg !== "startDuration" && arg !== "endDuration"){
+        return constructedQuery;
+      }
+    }
+    if(queryFunction === "band" || queryFunction === "over" || queryFunction === "shiftBand"){
+      if(arg !== "duration" && arg !== "period" && arg !== "num"){
+        return constructedQuery;
+      }
+    }
+    if(queryFunction === "window"){
+      if(arg !== "duration" && arg !== "period" && arg !== "num" && arg !== "funcName"){
+        return constructedQuery;
+      }
+    }
+
     if(queryVariable[arg]){
-      if(arg == "num"){
+      if(arg === "num"){
         constructedQuery += ', ' + queryVariable[arg]
       }else{
         constructedQuery += ', "' + queryVariable[arg] + '"'
@@ -90,14 +106,25 @@ export class QueryBuilderService {
       if(queryVariable["fillPolicy"]){
         constructedQuery += "-" + queryVariable["fillPolicy"]
       }
+    }else{
+      if(queryVariable["downsampleAgg"]){
+        constructedQuery += queryVariable["downsampleAgg"]
+      }
+      if(queryVariable["fillPolicy"]){
+        constructedQuery += "-" + queryVariable["fillPolicy"]
+      }
     }
     if(queryVariable["conversionFlag"]){
       constructedQuery += ":" + queryVariable["conversionFlag"]
     }
     if(queryVariable["flags"]){
-      constructedQuery += ":" + queryVariable["flags"]
+      constructedQuery += queryVariable["flags"]
     }
-    constructedQuery += ":" + queryVariable["metric"] + "{";
+    if(queryVariable["downsampleTime"] || queryVariable["downsampleAgg"] || queryVariable["fillPolicy"]){
+      constructedQuery += ":"
+    }
+    constructedQuery += queryVariable["metric"] + "{";
+    console.log(constructedQuery)
     if(queryVariable["metricTags"]){
       constructedQuery += queryVariable["metricTags"]
     }
@@ -119,9 +146,9 @@ export class QueryBuilderService {
       constructedQuery += '{}"'
     }
     var the_service = this;
-    var queryArgs = ["startDuration", "endDuration", "duration", "period", "funcName", "num"]
+    var queryArgs = ["startDuration", "endDuration", "duration", "period", "funcName", "num"];
     queryArgs.forEach(function (arg) {
-      constructedQuery = the_service.addQueryArg(constructedQuery, queryVariable, arg);
+      constructedQuery = the_service.addQueryArg(constructedQuery, queryVariable["queryFunction"], queryVariable, arg);
     });
     constructedQuery += ")";
     console.log(constructedQuery);
