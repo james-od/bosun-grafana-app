@@ -89,6 +89,9 @@ can click and drag it above the query block.
 
 ![Click and Drag Ex](src/img/clickAndDrag.gif)
 
+The free text box still works as before and no templating is required, templated variables and queries are just
+substituted in when referenced with their name - where the name begins with `$`.
+
 
  
 ## Local Development
