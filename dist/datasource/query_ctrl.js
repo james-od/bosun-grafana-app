@@ -123,6 +123,7 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
           _this2.addNewVariable = _this2.addNewVariable.bind(_assertThisInitialized(_this2));
           _this2.getMetricSuggestions = _this2.getMetricSuggestions.bind(_assertThisInitialized(_this2));
           _this2.addFilterTagBox = _this2.addFilterTagBox.bind(_assertThisInitialized(_this2));
+          _this2.addGroupTagBox = _this2.addGroupTagBox.bind(_assertThisInitialized(_this2));
           _this2.filterTypes = ["Group By", "Filter"];
 
           if (!_this2.target.variables) {
@@ -275,12 +276,20 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             _this2.target.filtertagBoxes = {};
           }
 
+          if (!_this2.target.grouptagBoxes) {
+            _this2.target.grouptagBoxes = {};
+          }
+
           if (!_this2.target.varCounter) {
             _this2.target.varCounter = 0;
           }
 
           if (!_this2.target.filterTagBoxCounter) {
             _this2.target.filterTagBoxCounter = 0;
+          }
+
+          if (!_this2.target.groupTagBoxCounter) {
+            _this2.target.groupTagBoxCounter = 0;
           }
 
           if (!_this2.target.finalQuery) {
@@ -338,11 +347,14 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
           }
         }, {
           key: "deleteTag",
-          value: function deleteTag(queryId, tagId) {
-            console.log("Delete filter tags, " + queryId + " " + tagId);
-            console.log(this.target.filtertagBoxes);
-            delete this.target.filtertagBoxes[queryId][tagId];
-            console.log(this.target.filtertagBoxes);
+          value: function deleteTag(queryId, tagId, type) {
+            if (type === 'filter') {
+              delete this.target.filtertagBoxes[queryId][tagId];
+            }
+
+            if (type === 'group') {
+              delete this.target.grouptagBoxes[queryId][tagId];
+            }
           }
         }, {
           key: "setSortable",
@@ -490,6 +502,19 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
               value: ""
             };
             this.target.filterTagBoxCounter += 1;
+          }
+        }, {
+          key: "addGroupTagBox",
+          value: function addGroupTagBox(queryId) {
+            if (!this.target.grouptagBoxes[queryId]) {
+              this.target.grouptagBoxes[queryId] = {};
+            }
+
+            this.target.grouptagBoxes[queryId][this.target.groupTagBoxCounter] = {
+              key: "",
+              value: ""
+            };
+            this.target.groupTagBoxCounter += 1;
           }
         }, {
           key: "addSuggest",

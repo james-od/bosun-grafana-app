@@ -125,9 +125,18 @@ export class QueryBuilderService {
       constructedQuery += ":"
     }
     constructedQuery += queryVariable["metric"] + "{";
-    console.log(constructedQuery)
-    if(queryVariable["metricTags"]){
-      constructedQuery += queryVariable["metricTags"]
+    if(controller.target.grouptagBoxes[id]) {
+      var onFirstTag = true;
+      for (var tagMapping in controller.target.grouptagBoxes[id]) {
+        if (controller.target.grouptagBoxes[id].hasOwnProperty(tagMapping)) {
+          if (!onFirstTag) {
+            constructedQuery += ","
+          } else {
+            onFirstTag = false;
+          }
+          constructedQuery += controller.target.grouptagBoxes[id][tagMapping]["key"] + "=" + controller.target.grouptagBoxes[id][tagMapping]["value"]
+        }
+      }
     }
     constructedQuery += "}";
     if(controller.target.filtertagBoxes[id]){
@@ -137,7 +146,7 @@ export class QueryBuilderService {
       for (var tagMapping in controller.target.filtertagBoxes[id]) {
         if (controller.target.filtertagBoxes[id].hasOwnProperty(tagMapping)) {
           if(!onFirstTag){
-            constructedQuery += ", "
+            constructedQuery += ","
           }else{onFirstTag = false;}
           constructedQuery += controller.target.filtertagBoxes[id][tagMapping]["key"] + "=" + controller.target.filtertagBoxes[id][tagMapping]["value"]
         }

@@ -64,6 +64,25 @@
           </div>
           <div class="gf-form" style="width:80%;align-items:flex-start;">
             <label class="gf-form-label query-keyword">
+              Group Tags
+            </label>
+            <label class="gf-form-label query-keyword" ng-click="ctrl.addGroupTagBox(id)">
+              +
+            </label>
+
+            <label
+              class="gf-form-label" style="overflow: hidden; height: 85px" ng-repeat="(tagId, name) in ctrl.target.grouptagBoxes[id]">
+              <input class="gf-form-input" style="float:left" ng-model="ctrl.target.grouptagBoxes[id][tagId]['key']" rows="1" spellcheck="false" placeholder="enter tag key" data-min-length=0 data-items=150>
+              <div class="gf-form" style="width:80%;align-items:flex-start;">
+                <input class="gf-form-input" style="float: left" ng-model="ctrl.target.grouptagBoxes[id][tagId]['value']" rows="1" spellcheck="false" placeholder="enter tag value" data-min-length=0 data-items=150>
+                <button class="gf-form-label" ng-click="ctrl.deleteTag(id, tagId, 'group')">
+                  -
+                </button>
+              </div>
+            </label>
+          </div>
+          <div class="gf-form" style="width:80%;align-items:flex-start;">
+            <label class="gf-form-label query-keyword">
               Filtering Tags
             </label>
             <label class="gf-form-label query-keyword" ng-click="ctrl.addFilterTagBox(id)">
@@ -72,10 +91,10 @@
 
             <label
               class="gf-form-label" style="overflow: hidden; height: 85px" ng-repeat="(tagId, name) in ctrl.target.filtertagBoxes[id]">
-              <input class="gf-form-input" style="float:left" ng-model="ctrl.target.filtertagBoxes[id][tagId]['key']" ng-change="ctrl.editTagBox()" rows="1" spellcheck="false" placeholder="enter tag key" data-min-length=0 data-items=150>
+              <input class="gf-form-input" style="float:left" ng-model="ctrl.target.filtertagBoxes[id][tagId]['key']" rows="1" spellcheck="false" placeholder="enter tag key" data-min-length=0 data-items=150>
               <div class="gf-form" style="width:80%;align-items:flex-start;">
-                <input class="gf-form-input" style="float: left" ng-model="ctrl.target.filtertagBoxes[id][tagId]['value']" ng-change="ctrl.editTagBox()" rows="1" spellcheck="false" placeholder="enter tag value" data-min-length=0 data-items=150>
-                <button class="gf-form-label" ng-click="ctrl.deleteTag(id, tagId)">
+                <input class="gf-form-input" style="float: left" ng-model="ctrl.target.filtertagBoxes[id][tagId]['value']" rows="1" spellcheck="false" placeholder="enter tag value" data-min-length=0 data-items=150>
+                <button class="gf-form-label" ng-click="ctrl.deleteTag(id, tagId, 'filter')">
                   -
                 </button>
               </div>

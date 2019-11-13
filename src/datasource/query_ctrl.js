@@ -25,6 +25,7 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     this.addNewVariable = this.addNewVariable.bind(this);
     this.getMetricSuggestions = this.getMetricSuggestions.bind(this);
     this.addFilterTagBox = this.addFilterTagBox.bind(this);
+    this.addGroupTagBox = this.addGroupTagBox.bind(this);
     this.filterTypes = ["Group By", "Filter"]
     if(!this.target.variables){
       this.target.variables = {};
@@ -51,11 +52,17 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     if(!this.target.filtertagBoxes){
       this.target.filtertagBoxes = {};
     }
+    if(!this.target.grouptagBoxes) {
+      this.target.grouptagBoxes = {};
+    }
     if(!this.target.varCounter){
       this.target.varCounter = 0;
     }
     if(!this.target.filterTagBoxCounter){
       this.target.filterTagBoxCounter = 0;
+    }
+    if(!this.target.groupTagBoxCounter) {
+      this.target.groupTagBoxCounter = 0;
     }
     if(!this.target.finalQuery){
       this.target.finalQuery = "";
@@ -102,11 +109,13 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     }
   }
 
-  deleteTag(queryId, tagId){
-    console.log("Delete filter tags, " + queryId + " " + tagId)
-    console.log(this.target.filtertagBoxes)
-    delete this.target.filtertagBoxes[queryId][tagId]
-    console.log(this.target.filtertagBoxes)
+  deleteTag(queryId, tagId, type){
+    if(type === 'filter'){
+      delete this.target.filtertagBoxes[queryId][tagId]
+    }
+    if(type === 'group'){
+      delete this.target.grouptagBoxes[queryId][tagId]
+    }
   }
 
   setSortable(){
@@ -218,6 +227,14 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     }
     this.target.filtertagBoxes[queryId][this.target.filterTagBoxCounter] = {key: "", value: ""};
     this.target.filterTagBoxCounter += 1;
+  }
+
+  addGroupTagBox(queryId) {
+    if(!this.target.grouptagBoxes[queryId]){
+      this.target.grouptagBoxes[queryId] = {}
+    }
+    this.target.grouptagBoxes[queryId][this.target.groupTagBoxCounter] = {key: "", value: ""};
+    this.target.groupTagBoxCounter += 1;
   }
 
   addSuggest() {
