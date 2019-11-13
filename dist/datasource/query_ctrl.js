@@ -100,7 +100,7 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
       _export("BosunDatasourceQueryCtrl", BosunDatasourceQueryCtrl = function (_QueryCtrl) {
         _inherits(BosunDatasourceQueryCtrl, _QueryCtrl);
 
-        function BosunDatasourceQueryCtrl($scope, $injector, uiSegmentSrv, $sce) {
+        function BosunDatasourceQueryCtrl($scope, $injector, uiSegmentSrv, $sce, $window) {
           var _this2;
 
           _classCallCheck(this, BosunDatasourceQueryCtrl);
@@ -307,7 +307,14 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             _this2.target.flags = "";
           }
 
-          console.log(_this2.target);
+          var _this = _assertThisInitialized(_this2);
+
+          $(document).ready(function () {
+            //Give time for page to load before setting elements as sortable
+            setTimeout(function () {
+              _this.setSortable();
+            }, 2000);
+          });
           return _this2;
         }
 
@@ -474,7 +481,6 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
         }, {
           key: "updateFinalQuery",
           value: function updateFinalQuery(finalQuery) {
-            this.setSortable();
             var qbs = new QueryBuilderService();
             this.target.expr = qbs.substituteFinalQuery(finalQuery, this);
             this.panelCtrl.refresh();

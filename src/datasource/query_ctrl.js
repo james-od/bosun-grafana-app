@@ -6,7 +6,7 @@ import {QueryBuilderService} from "./queryBuilderService";
 
 export class BosunDatasourceQueryCtrl extends QueryCtrl {
 
-  constructor($scope, $injector, uiSegmentSrv, $sce) {
+  constructor($scope, $injector, uiSegmentSrv, $sce, $window) {
     super($scope, $injector, $sce);
     this.scope = $scope;
     this.sce = $sce;
@@ -75,7 +75,13 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     if(!this.target.flags){
       this.target.flags = "";
     }
-    console.log(this.target)
+    var _this = this;
+    $(document).ready(function(){
+      //Give time for page to load before setting elements as sortable
+      setTimeout(function(){
+        _this.setSortable();
+        }, 2000);
+    })
   }
 
   deleteVariable(id){
@@ -207,7 +213,6 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
   }
 
   updateFinalQuery(finalQuery) {
-    this.setSortable();
     var qbs = new QueryBuilderService();
     this.target.expr = qbs.substituteFinalQuery(finalQuery, this);
     this.panelCtrl.refresh();

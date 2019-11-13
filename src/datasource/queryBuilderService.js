@@ -61,22 +61,7 @@ export class QueryBuilderService {
     return substitutedFinalQuery;
   }
 
-  addQueryArg(constructedQuery, queryFunction, queryVariable, arg){
-    if(queryFunction === "q" || queryFunction === "change" || queryFunction === "count"){
-      if(arg !== "startDuration" && arg !== "endDuration"){
-        return constructedQuery;
-      }
-    }
-    if(queryFunction === "band" || queryFunction === "over" || queryFunction === "shiftBand"){
-      if(arg !== "duration" && arg !== "period" && arg !== "num"){
-        return constructedQuery;
-      }
-    }
-    if(queryFunction === "window"){
-      if(arg !== "duration" && arg !== "period" && arg !== "num" && arg !== "funcName"){
-        return constructedQuery;
-      }
-    }
+  addQueryArg(constructedQuery, queryVariable, arg){
 
     if(queryVariable[arg]){
       if(arg === "num"){
@@ -84,6 +69,8 @@ export class QueryBuilderService {
       }else{
         constructedQuery += ', "' + queryVariable[arg] + '"'
       }
+    }else{
+      constructedQuery += ', ""'
     }
     return constructedQuery
   }
@@ -156,10 +143,22 @@ export class QueryBuilderService {
       constructedQuery += '{}"'
     }
     var the_service = this;
-    var queryArgs = ["startDuration", "endDuration", "duration", "period", "funcName", "num"];
-    queryArgs.forEach(function (arg) {
-      constructedQuery = the_service.addQueryArg(constructedQuery, queryVariable["queryFunction"], queryVariable, arg);
-    });
+    if(queryVariable["queryFunction"] === "q" || queryVariable["queryFunction"] === "change" || queryVariable["queryFunction"] === "count") {
+      console.log("Query func 1")
+      constructedQuery = the_service.addQueryArg(constructedQuery, queryVariable, "startDuration");
+      constructedQuery = the_service.addQueryArg(constructedQuery, queryVariable, "endDuration");
+    }
+    if(queryVariable["queryFunction"] === "band" || queryVariable["queryFunction"] === "over" || queryVariable["queryFunction"] === "shiftBand") {
+      constructedQuery = the_service.addQueryArg(constructedQuery, queryVariable, "duration");
+      constructedQuery = the_service.addQueryArg(constructedQuery, queryVariable, "period");
+      constructedQuery = the_service.addQueryArg(constructedQuery, queryVariable, "num");
+    }
+    if(queryVariable["queryFunction"] === "window") {
+      constructedQuery = the_service.addQueryArg(constructedQuery, queryVariable, "duration");
+      constructedQuery = the_service.addQueryArg(constructedQuery, queryVariable, "period");
+      constructedQuery = the_service.addQueryArg(constructedQuery, queryVariable, "num");
+      constructedQuery = the_service.addQueryArg(constructedQuery, queryVariable, "funcName");
+    }
     constructedQuery += ")";
     console.log(constructedQuery);
     return constructedQuery;
