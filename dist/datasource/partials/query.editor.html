@@ -1,6 +1,6 @@
-<query-editor-row query-ctrl="ctrl">
+<query-editor-row query-ctrl="ctrl" ng-init="ctrl.setSortable()">
 
-  <ul id="allVariables" ng-init="ctrl.setSortable()">
+  <ul id="allVariables">
     <li ng-repeat="(id, variable) in ctrl.target.variables" id="{{id}}">
 
       <div ng-if="variable.type == 'variable'">
@@ -64,17 +64,17 @@
           </div>
           <div class="gf-form" style="width:80%;align-items:flex-start;">
             <label class="gf-form-label query-keyword">
-              Tags
+              Filtering Tags
             </label>
-            <label class="gf-form-label query-keyword" ng-click="ctrl.addTagBox(id)">
+            <label class="gf-form-label query-keyword" ng-click="ctrl.addFilterTagBox(id)">
               +
             </label>
 
             <label
-              class="gf-form-label" style="overflow: hidden; height: 85px" ng-repeat="(tagId, name) in ctrl.target.tagBoxes[id]">
-              <input class="gf-form-input" style="float:left" ng-model="ctrl.target.tagBoxes[id][tagId]['key']" ng-change="ctrl.editTagBox()" rows="1" spellcheck="false" placeholder="enter tag key" data-min-length=0 data-items=150>
+              class="gf-form-label" style="overflow: hidden; height: 85px" ng-repeat="(tagId, name) in ctrl.target.filtertagBoxes[id]">
+              <input class="gf-form-input" style="float:left" ng-model="ctrl.target.filtertagBoxes[id][tagId]['key']" ng-change="ctrl.editTagBox()" rows="1" spellcheck="false" placeholder="enter tag key" data-min-length=0 data-items=150>
               <div class="gf-form" style="width:80%;align-items:flex-start;">
-                <input class="gf-form-input" style="float: left" ng-model="ctrl.target.tagBoxes[id][tagId]['value']" ng-change="ctrl.editTagBox()" rows="1" spellcheck="false" placeholder="enter tag value" data-min-length=0 data-items=150>
+                <input class="gf-form-input" style="float: left" ng-model="ctrl.target.filtertagBoxes[id][tagId]['value']" ng-change="ctrl.editTagBox()" rows="1" spellcheck="false" placeholder="enter tag value" data-min-length=0 data-items=150>
                 <button class="gf-form-label" ng-click="ctrl.deleteTag(id, tagId)">
                   -
                 </button>

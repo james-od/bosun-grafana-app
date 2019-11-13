@@ -122,7 +122,7 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
           _this2.suggestTagValues = _this2.suggestTagValues.bind(_assertThisInitialized(_this2));
           _this2.addNewVariable = _this2.addNewVariable.bind(_assertThisInitialized(_this2));
           _this2.getMetricSuggestions = _this2.getMetricSuggestions.bind(_assertThisInitialized(_this2));
-          _this2.addTagBox = _this2.addTagBox.bind(_assertThisInitialized(_this2));
+          _this2.addFilterTagBox = _this2.addFilterTagBox.bind(_assertThisInitialized(_this2));
           _this2.filterTypes = ["Group By", "Filter"];
 
           if (!_this2.target.variables) {
@@ -271,16 +271,16 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
           }];
           _this2.scope.suggestions = [];
 
-          if (!_this2.target.tagBoxes) {
-            _this2.target.tagBoxes = {};
+          if (!_this2.target.filtertagBoxes) {
+            _this2.target.filtertagBoxes = {};
           }
 
           if (!_this2.target.varCounter) {
             _this2.target.varCounter = 0;
           }
 
-          if (!_this2.target.tagBoxCounter) {
-            _this2.target.tagBoxCounter = 0;
+          if (!_this2.target.filterTagBoxCounter) {
+            _this2.target.filterTagBoxCounter = 0;
           }
 
           if (!_this2.target.finalQuery) {
@@ -339,10 +339,10 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
         }, {
           key: "deleteTag",
           value: function deleteTag(queryId, tagId) {
-            console.log("Delete tags, " + queryId + " " + tagId);
-            console.log(this.target.tagBoxes);
-            delete this.target.tagBoxes[queryId][tagId];
-            console.log(this.target.tagBoxes);
+            console.log("Delete filter tags, " + queryId + " " + tagId);
+            console.log(this.target.filtertagBoxes);
+            delete this.target.filtertagBoxes[queryId][tagId];
+            console.log(this.target.filtertagBoxes);
           }
         }, {
           key: "setSortable",
@@ -462,6 +462,7 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
         }, {
           key: "updateFinalQuery",
           value: function updateFinalQuery(finalQuery) {
+            this.setSortable();
             var qbs = new QueryBuilderService();
             this.target.expr = qbs.substituteFinalQuery(finalQuery, this);
             this.panelCtrl.refresh();
@@ -478,17 +479,17 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             this.setSortable();
           }
         }, {
-          key: "addTagBox",
-          value: function addTagBox(queryId) {
-            if (!this.target.tagBoxes[queryId]) {
-              this.target.tagBoxes[queryId] = {};
+          key: "addFilterTagBox",
+          value: function addFilterTagBox(queryId) {
+            if (!this.target.filtertagBoxes[queryId]) {
+              this.target.filtertagBoxes[queryId] = {};
             }
 
-            this.target.tagBoxes[queryId][this.target.tagBoxCounter] = {
+            this.target.filtertagBoxes[queryId][this.target.filterTagBoxCounter] = {
               key: "",
               value: ""
             };
-            this.target.tagBoxCounter += 1;
+            this.target.filterTagBoxCounter += 1;
           }
         }, {
           key: "addSuggest",

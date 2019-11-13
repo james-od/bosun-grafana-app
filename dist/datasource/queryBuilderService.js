@@ -66,7 +66,8 @@ System.register([], function (_export, _context) {
         }, {
           key: "substituteFinalQuery",
           value: function substituteFinalQuery(finalQuery, controller) {
-            //Dictionary doesn't guarantee ordering, so convert to array and sort by key
+            console.log(controller); //Dictionary doesn't guarantee ordering, so convert to array and sort by key
+
             var orderedVariablesList = [];
             var variables = controller.target.variables;
             var variableOrder = controller.target.variableOrder;
@@ -182,7 +183,7 @@ System.register([], function (_export, _context) {
             }
 
             if (queryVariable["flags"]) {
-              constructedQuery += queryVariable["flags"];
+              constructedQuery += ":" + queryVariable["flags"];
             }
 
             if (queryVariable["downsampleTime"] || queryVariable["downsampleAgg"] || queryVariable["fillPolicy"]) {
@@ -198,19 +199,19 @@ System.register([], function (_export, _context) {
 
             constructedQuery += "}";
 
-            if (controller.target.tagBoxes[id]) {
+            if (controller.target.filtertagBoxes[id]) {
               var onFirstTag = true;
               constructedQuery += "{";
 
-              for (var tagMapping in controller.target.tagBoxes[id]) {
-                if (controller.target.tagBoxes[id].hasOwnProperty(tagMapping)) {
+              for (var tagMapping in controller.target.filtertagBoxes[id]) {
+                if (controller.target.filtertagBoxes[id].hasOwnProperty(tagMapping)) {
                   if (!onFirstTag) {
                     constructedQuery += ", ";
                   } else {
                     onFirstTag = false;
                   }
 
-                  constructedQuery += controller.target.tagBoxes[id][tagMapping]["key"] + "=" + controller.target.tagBoxes[id][tagMapping]["value"];
+                  constructedQuery += controller.target.filtertagBoxes[id][tagMapping]["key"] + "=" + controller.target.filtertagBoxes[id][tagMapping]["value"];
                 }
               }
 

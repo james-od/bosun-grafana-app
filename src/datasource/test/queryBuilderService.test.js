@@ -57,7 +57,7 @@ test('Complex substitutions', () => {
       }
     },
     variableOrder: [],
-    tagBoxes: {
+    filtertagBoxes: {
       2: {0: {key: "tagName", value: "$tagValue"}}
     }
   };
@@ -78,7 +78,7 @@ test('Flags', () => {
       }
     },
     variableOrder: [],
-    tagBoxes: {}
+    filtertagBoxes: {}
   };
   expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe(
     "q(\"avg:$time-avg:rate{counter,,1}:example.metric{}{}\", \"$time\", \"2h\")"
@@ -99,7 +99,7 @@ test('reordered complex substitution', () => {
     },
     //Simpler than trying to mock HTMLCollection
     variableOrder: [{"id": 0}, {"id": 2}, {"id": 1}],
-    tagBoxes: {
+    filtertagBoxes: {
       2: {0: {key: "tagName", value: "$tagValue"}}
     }
   };
@@ -143,7 +143,7 @@ test('query types with `num` arg are built correctly', () => {
       }
     },
     variableOrder: [],
-    tagBoxes: {
+    filtertagBoxes: {
       2: {0: {key: "tagName", value: "$tagValue"}}
     }
   };

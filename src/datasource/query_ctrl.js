@@ -24,7 +24,7 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     this.suggestTagValues = this.suggestTagValues.bind(this);
     this.addNewVariable = this.addNewVariable.bind(this);
     this.getMetricSuggestions = this.getMetricSuggestions.bind(this);
-    this.addTagBox = this.addTagBox.bind(this);
+    this.addFilterTagBox = this.addFilterTagBox.bind(this);
     this.filterTypes = ["Group By", "Filter"]
     if(!this.target.variables){
       this.target.variables = {};
@@ -48,14 +48,14 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
       {func: 'window', type:'seriesSet', args:{'query': 'string', 'duration': 'string', 'period': 'string', 'num': 'scalar', 'funcName': 'string'}},
     ];
     this.scope.suggestions = [];
-    if(!this.target.tagBoxes){
-      this.target.tagBoxes = {};
+    if(!this.target.filtertagBoxes){
+      this.target.filtertagBoxes = {};
     }
     if(!this.target.varCounter){
       this.target.varCounter = 0;
     }
-    if(!this.target.tagBoxCounter){
-      this.target.tagBoxCounter = 0;
+    if(!this.target.filterTagBoxCounter){
+      this.target.filterTagBoxCounter = 0;
     }
     if(!this.target.finalQuery){
       this.target.finalQuery = "";
@@ -103,10 +103,10 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
   }
 
   deleteTag(queryId, tagId){
-    console.log("Delete tags, " + queryId + " " + tagId)
-    console.log(this.target.tagBoxes)
-    delete this.target.tagBoxes[queryId][tagId]
-    console.log(this.target.tagBoxes)
+    console.log("Delete filter tags, " + queryId + " " + tagId)
+    console.log(this.target.filtertagBoxes)
+    delete this.target.filtertagBoxes[queryId][tagId]
+    console.log(this.target.filtertagBoxes)
   }
 
   setSortable(){
@@ -198,6 +198,7 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
   }
 
   updateFinalQuery(finalQuery) {
+    this.setSortable();
     var qbs = new QueryBuilderService();
     this.target.expr = qbs.substituteFinalQuery(finalQuery, this);
     this.panelCtrl.refresh();
@@ -211,12 +212,12 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     this.setSortable();
   }
 
-  addTagBox(queryId) {
-    if(!this.target.tagBoxes[queryId]){
-      this.target.tagBoxes[queryId] = {}
+  addFilterTagBox(queryId) {
+    if(!this.target.filtertagBoxes[queryId]){
+      this.target.filtertagBoxes[queryId] = {}
     }
-    this.target.tagBoxes[queryId][this.target.tagBoxCounter] = {key: "", value: ""};
-    this.target.tagBoxCounter += 1;
+    this.target.filtertagBoxes[queryId][this.target.filterTagBoxCounter] = {key: "", value: ""};
+    this.target.filterTagBoxCounter += 1;
   }
 
   addSuggest() {
