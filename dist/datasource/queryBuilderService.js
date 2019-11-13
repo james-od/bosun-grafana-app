@@ -104,18 +104,16 @@ System.register([], function (_export, _context) {
           }
         }, {
           key: "addQueryArg",
-          value: function addQueryArg(constructedQuery, queryVariable, arg) {
+          value: function addQueryArg(queryVariable, arg) {
             if (queryVariable[arg]) {
               if (arg === "num") {
-                constructedQuery += ', ' + queryVariable[arg];
+                return ', ' + queryVariable[arg];
               } else {
-                constructedQuery += ', "' + queryVariable[arg] + '"';
+                return ', "' + queryVariable[arg] + '"';
               }
             } else {
-              constructedQuery += ', ""';
+              return ', ""';
             }
-
-            return constructedQuery;
           }
         }, {
           key: "buildQueryVariable",
@@ -215,25 +213,24 @@ System.register([], function (_export, _context) {
               constructedQuery += '{}"';
             }
 
-            var the_service = this;
+            var queryVar = queryVariable["queryFunction"];
 
-            if (queryVariable["queryFunction"] === "q" || queryVariable["queryFunction"] === "change" || queryVariable["queryFunction"] === "count") {
-              console.log("Query func 1");
-              constructedQuery = the_service.addQueryArg(constructedQuery, queryVariable, "startDuration");
-              constructedQuery = the_service.addQueryArg(constructedQuery, queryVariable, "endDuration");
+            if (queryVar === "q" || queryVar === "change" || queryVar === "count") {
+              constructedQuery += this.addQueryArg(queryVariable, "startDuration");
+              constructedQuery += this.addQueryArg(queryVariable, "endDuration");
             }
 
-            if (queryVariable["queryFunction"] === "band" || queryVariable["queryFunction"] === "over" || queryVariable["queryFunction"] === "shiftBand") {
-              constructedQuery = the_service.addQueryArg(constructedQuery, queryVariable, "duration");
-              constructedQuery = the_service.addQueryArg(constructedQuery, queryVariable, "period");
-              constructedQuery = the_service.addQueryArg(constructedQuery, queryVariable, "num");
+            if (queryVar === "band" || queryVar === "over" || queryVar === "shiftBand") {
+              constructedQuery += this.addQueryArg(queryVariable, "duration");
+              constructedQuery += this.addQueryArg(queryVariable, "period");
+              constructedQuery += this.addQueryArg(queryVariable, "num");
             }
 
-            if (queryVariable["queryFunction"] === "window") {
-              constructedQuery = the_service.addQueryArg(constructedQuery, queryVariable, "duration");
-              constructedQuery = the_service.addQueryArg(constructedQuery, queryVariable, "period");
-              constructedQuery = the_service.addQueryArg(constructedQuery, queryVariable, "num");
-              constructedQuery = the_service.addQueryArg(constructedQuery, queryVariable, "funcName");
+            if (queryVar === "window") {
+              constructedQuery += this.addQueryArg(queryVariable, "duration");
+              constructedQuery += this.addQueryArg(queryVariable, "period");
+              constructedQuery += this.addQueryArg(queryVariable, "num");
+              constructedQuery += this.addQueryArg(queryVariable, "funcName");
             }
 
             constructedQuery += ")";
