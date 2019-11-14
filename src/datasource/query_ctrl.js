@@ -86,7 +86,7 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
       setTimeout(function(){
         _this.setSortable();
         }, 2000);
-    })
+    });
     this.updateFinalQuery(this.target.finalQuery);
   }
 
