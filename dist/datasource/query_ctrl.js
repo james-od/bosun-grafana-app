@@ -100,7 +100,7 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
       _export("BosunDatasourceQueryCtrl", BosunDatasourceQueryCtrl = function (_QueryCtrl) {
         _inherits(BosunDatasourceQueryCtrl, _QueryCtrl);
 
-        function BosunDatasourceQueryCtrl($scope, $injector, uiSegmentSrv, $sce, $window) {
+        function BosunDatasourceQueryCtrl($scope, $injector, uiSegmentSrv, $sce) {
           var _this2;
 
           _classCallCheck(this, BosunDatasourceQueryCtrl);
@@ -293,7 +293,12 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
           }
 
           if (!_this2.target.finalQuery) {
-            _this2.target.finalQuery = "";
+            if (_this2.target.expr) {
+              _this2.target.finalQuery = _this2.target.expr;
+              _this2.target.expr = "";
+            } else {
+              _this2.target.finalQuery = "";
+            }
           }
 
           console.log(_this2.target.finalQuery);
@@ -315,6 +320,9 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
               _this.setSortable();
             }, 2000);
           });
+
+          _this2.updateFinalQuery(_this2.target.finalQuery);
+
           return _this2;
         }
 
@@ -330,7 +338,7 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             } //Reorder variables by variable order as deletion resets it
 
 
-            var values = new Array();
+            var values = [];
 
             if (this.target.variableOrder.length) {
               for (var i = 0; i < this.target.variableOrder.length; i++) {

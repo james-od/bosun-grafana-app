@@ -6,7 +6,7 @@ import {QueryBuilderService} from "./queryBuilderService";
 
 export class BosunDatasourceQueryCtrl extends QueryCtrl {
 
-  constructor($scope, $injector, uiSegmentSrv, $sce, $window) {
+  constructor($scope, $injector, uiSegmentSrv, $sce) {
     super($scope, $injector, $sce);
     this.scope = $scope;
     this.sce = $sce;
@@ -65,7 +65,12 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
       this.target.groupTagBoxCounter = 0;
     }
     if(!this.target.finalQuery){
-      this.target.finalQuery = "";
+      if(this.target.expr){
+        this.target.finalQuery = this.target.expr;
+        this.target.expr = ""
+      }else{
+        this.target.finalQuery = "";
+      }
     }
     console.log(this.target.finalQuery)
     this.target.subbedQuery = "";
@@ -82,6 +87,7 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
         _this.setSortable();
         }, 2000);
     })
+    this.updateFinalQuery(this.target.finalQuery);
   }
 
   deleteVariable(id){
@@ -95,7 +101,7 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     }
 
     //Reorder variables by variable order as deletion resets it
-    var values = new Array();
+    var values = [];
     if (this.target.variableOrder.length) {
       for (var i = 0; i < this.target.variableOrder.length; i++) {
         this.target.variables[this.target.variableOrder[i].id]["id"] = this.target.variableOrder[i].id
@@ -104,12 +110,12 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     } else {
       for (var id in this.target.variables) {
         if (this.target.variables.hasOwnProperty(id)) {
-          this.target.variables[id]["id"] = id
+          this.target.variables[id]["id"] = id;
           values.push(this.target.variables[id])
         }
       }
     }
-    this.target.variables = {}
+    this.target.variables = {};
     for(var i=0; i<values.length; i++){
       this.target.variables[i] = values[i];
     }
@@ -236,7 +242,7 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
 
   addGroupTagBox(queryId) {
     if(!this.target.grouptagBoxes[queryId]){
-      this.target.grouptagBoxes[queryId] = {}
+      this.target.grouptagBoxes[queryId] = {};
     }
     this.target.grouptagBoxes[queryId][this.target.groupTagBoxCounter] = {key: "", value: ""};
     this.target.groupTagBoxCounter += 1;
