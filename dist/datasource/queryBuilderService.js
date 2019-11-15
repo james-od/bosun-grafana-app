@@ -46,6 +46,8 @@ System.register([], function (_export, _context) {
         }, {
           key: "buildWithDefaultOrdering",
           value: function buildWithDefaultOrdering(variables, values) {
+            variables = _.orderBy(variables, ['indexInUI']);
+
             for (var id in variables) {
               if (variables.hasOwnProperty(id)) {
                 variables[id]["id"] = id;
@@ -70,15 +72,7 @@ System.register([], function (_export, _context) {
 
             var orderedVariablesList = [];
             var variables = controller.target.variables;
-            var variableOrder = controller.target.variableOrder;
-            var variableOrderLength = variableOrder.length;
-
-            if (variableOrderLength) {
-              this.buildWithProvidedOrdering(variableOrderLength, variables, variableOrder, orderedVariablesList);
-            } else {
-              this.buildWithDefaultOrdering(variables, orderedVariablesList);
-            }
-
+            this.buildWithDefaultOrdering(variables, orderedVariablesList);
             orderedVariablesList.sort(); //Work upwards
 
             orderedVariablesList = orderedVariablesList.reverse();

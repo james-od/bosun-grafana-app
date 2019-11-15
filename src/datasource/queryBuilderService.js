@@ -8,6 +8,8 @@ export class QueryBuilderService {
   }
 
   buildWithDefaultOrdering(variables, values){
+    variables = _.orderBy(variables, ['indexInUI'])
+
     for (var id in variables) {
       if (variables.hasOwnProperty(id)) {
         variables[id]["id"] = id;
@@ -29,13 +31,7 @@ export class QueryBuilderService {
     //Dictionary doesn't guarantee ordering, so convert to array and sort by key
     var orderedVariablesList = [];
     const variables = controller.target.variables;
-    const variableOrder = controller.target.variableOrder;
-    const variableOrderLength = variableOrder.length;
-    if (variableOrderLength) {
-      this.buildWithProvidedOrdering(variableOrderLength, variables, variableOrder, orderedVariablesList);
-    } else {
-      this.buildWithDefaultOrdering(variables, orderedVariablesList);
-    }
+    this.buildWithDefaultOrdering(variables, orderedVariablesList);
     orderedVariablesList.sort();
     //Work upwards
     orderedVariablesList = orderedVariablesList.reverse();

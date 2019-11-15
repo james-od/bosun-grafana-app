@@ -106,6 +106,7 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
             }
           },
           variableOrder: [],
+          grouptagBoxes: {},
           filtertagBoxes: {
             2: {
               0: {
@@ -137,6 +138,7 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
             }
           },
           variableOrder: [],
+          grouptagBoxes: {},
           filtertagBoxes: {}
         };
         expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe("q(\"avg:$time-avg:rate{counter,,1}:example.metric{}{}\", \"$time\", \"2h\")");
@@ -177,6 +179,7 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
           }, {
             "id": 1
           }],
+          grouptagBoxes: {},
           filtertagBoxes: {
             2: {
               0: {
@@ -246,6 +249,7 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
             }
           },
           variableOrder: [],
+          grouptagBoxes: {},
           filtertagBoxes: {
             2: {
               0: {

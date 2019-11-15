@@ -28,7 +28,9 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     this.addGroupTagBox = this.addGroupTagBox.bind(this);
     this.filterTypes = ["Group By", "Filter"]
     if(!this.target.variables){
-      this.target.variables = {};
+      this.target.variables = [];
+    }else{
+      this.target.variables = _.orderBy(this.target.variables, ['indexInUI'])
     }
     this.scope.aggOptions = [
       {text: 'avg'}, {text: 'count'}, {text: 'dev'}, {text: 'diff'}, {text: 'ep50r3'}, {text: 'ep50r7'},
@@ -74,9 +76,6 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     }
     console.log(this.target.finalQuery)
     this.target.subbedQuery = "";
-    if(!this.target.variableOrder){
-      this.target.variableOrder = [];
-    }
     if(!this.target.flags){
       this.target.flags = "";
     }
@@ -87,38 +86,31 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
         _this.setSortable();
         }, 2000);
     });
-    this.updateFinalQuery(this.target.finalQuery);
+    try{
+      this.updateFinalQuery(this.target.finalQuery);
+    }catch (e) {
+      console.log(e)
+    }
   }
 
-  deleteVariable(id){
-    delete this.target.variables[id];
+  _objectWithoutProperties(obj, keys) {
+    var target = {};
+    for (var i in obj) {
+      if (keys.indexOf(i) >= 0) continue;
+      if (!Object.prototype.hasOwnProperty.call(obj, i)) continue;
+      target[i] = obj[i];
+    }
+    return target;
+  }
 
-    //delete corresponding id in variableOrder
-    for(var i=0; i<this.target.variableOrder.length; i++){
-      if(this.target.variableOrder[i].id == id){
-        this.target.variableOrder[i].remove()
+  deleteVariable(id) {
+    var tmp = []
+    for (var i = 0; i < this.target.variables.length; i++) {
+      if (this.target.variables[i].id.toString() !== id.toString()) {
+        tmp.push(this._objectWithoutProperties(this.target.variables[i], ["$$hashKey"]))
       }
     }
-
-    //Reorder variables by variable order as deletion resets it
-    var values = [];
-    if (this.target.variableOrder.length) {
-      for (var i = 0; i < this.target.variableOrder.length; i++) {
-        this.target.variables[this.target.variableOrder[i].id]["id"] = this.target.variableOrder[i].id
-        values.push(this.target.variables[this.target.variableOrder[i].id])
-      }
-    } else {
-      for (var id in this.target.variables) {
-        if (this.target.variables.hasOwnProperty(id)) {
-          this.target.variables[id]["id"] = id;
-          values.push(this.target.variables[id])
-        }
-      }
-    }
-    this.target.variables = {};
-    for(var i=0; i<values.length; i++){
-      this.target.variables[i] = values[i];
-    }
+    this.target.variables = tmp;
   }
 
   deleteTag(queryId, tagId, type){
@@ -130,12 +122,26 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     }
   }
 
+  htmlCollectionToListOfIds(htmlCollection){
+    var ret = []
+    for(var i=0; i<htmlCollection.length; i++){
+      ret.push(htmlCollection[i].id)
+    }
+    return ret;
+  }
+
   setSortable(){
     var el = document.getElementById('allVariables');
     let _this = this;
     var sortable = Sortable.create(el, {
       onUpdate(evt) {
-        _this.target.variableOrder = evt.to.children;
+        console.log(evt.to.children)
+        var orderedListOfIds = _this.htmlCollectionToListOfIds(evt.to.children);
+
+        for(var i=0; i<_this.target.variables.length; i++){
+          _this.target.variables[i]["indexInUI"] = orderedListOfIds[_this.target.variables[i].id]
+        }
+        _this.target.variables = _.orderBy(_this.target.variables, ['indexInUI'])
       }
     });
   }
@@ -227,9 +233,19 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
   }
 
   addNewVariable(type) {
-    this.target.variables[this.target.varCounter] = {type: type};
+    this.target.variables.push({id: this.target.varCounter, type: type});
     this.target.varCounter += 1;
     this.setSortable();
+
+    var orderedListOfIds = document.querySelectorAll('#allVariables li[id]');
+
+    for(var i=0; i<orderedListOfIds.length; i++){
+      if(this.target.variables[i]){
+        this.target.variables[i]["indexInUI"] = orderedListOfIds[i]
+      }
+    }
+
+    this.target.variables = _.orderBy(this.target.variables, ['indexInUI'])
   }
 
   addFilterTagBox(queryId) {

@@ -127,7 +127,9 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
           _this2.filterTypes = ["Group By", "Filter"];
 
           if (!_this2.target.variables) {
-            _this2.target.variables = {};
+            _this2.target.variables = [];
+          } else {
+            _this2.target.variables = _.orderBy(_this2.target.variables, ['indexInUI']);
           }
 
           _this2.scope.aggOptions = [{
@@ -304,10 +306,6 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
           console.log(_this2.target.finalQuery);
           _this2.target.subbedQuery = "";
 
-          if (!_this2.target.variableOrder) {
-            _this2.target.variableOrder = [];
-          }
-
           if (!_this2.target.flags) {
             _this2.target.flags = "";
           }
@@ -321,44 +319,40 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             }, 2000);
           });
 
-          _this2.updateFinalQuery(_this2.target.finalQuery);
+          try {
+            _this2.updateFinalQuery(_this2.target.finalQuery);
+          } catch (e) {
+            console.log(e);
+          }
 
           return _this2;
         }
 
         _createClass(BosunDatasourceQueryCtrl, [{
+          key: "_objectWithoutProperties",
+          value: function _objectWithoutProperties(obj, keys) {
+            var target = {};
+
+            for (var i in obj) {
+              if (keys.indexOf(i) >= 0) continue;
+              if (!Object.prototype.hasOwnProperty.call(obj, i)) continue;
+              target[i] = obj[i];
+            }
+
+            return target;
+          }
+        }, {
           key: "deleteVariable",
           value: function deleteVariable(id) {
-            delete this.target.variables[id]; //delete corresponding id in variableOrder
+            var tmp = [];
 
-            for (var i = 0; i < this.target.variableOrder.length; i++) {
-              if (this.target.variableOrder[i].id == id) {
-                this.target.variableOrder[i].remove();
-              }
-            } //Reorder variables by variable order as deletion resets it
-
-
-            var values = [];
-
-            if (this.target.variableOrder.length) {
-              for (var i = 0; i < this.target.variableOrder.length; i++) {
-                this.target.variables[this.target.variableOrder[i].id]["id"] = this.target.variableOrder[i].id;
-                values.push(this.target.variables[this.target.variableOrder[i].id]);
-              }
-            } else {
-              for (var id in this.target.variables) {
-                if (this.target.variables.hasOwnProperty(id)) {
-                  this.target.variables[id]["id"] = id;
-                  values.push(this.target.variables[id]);
-                }
+            for (var i = 0; i < this.target.variables.length; i++) {
+              if (this.target.variables[i].id.toString() !== id.toString()) {
+                tmp.push(this._objectWithoutProperties(this.target.variables[i], ["$$hashKey"]));
               }
             }
 
-            this.target.variables = {};
-
-            for (var i = 0; i < values.length; i++) {
-              this.target.variables[i] = values[i];
-            }
+            this.target.variables = tmp;
           }
         }, {
           key: "deleteTag",
@@ -372,6 +366,17 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             }
           }
         }, {
+          key: "htmlCollectionToListOfIds",
+          value: function htmlCollectionToListOfIds(htmlCollection) {
+            var ret = [];
+
+            for (var i = 0; i < htmlCollection.length; i++) {
+              ret.push(htmlCollection[i].id);
+            }
+
+            return ret;
+          }
+        }, {
           key: "setSortable",
           value: function setSortable() {
             var el = document.getElementById('allVariables');
@@ -380,7 +385,15 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
 
             var sortable = Sortable.create(el, {
               onUpdate: function onUpdate(evt) {
-                _this.target.variableOrder = evt.to.children;
+                console.log(evt.to.children);
+
+                var orderedListOfIds = _this.htmlCollectionToListOfIds(evt.to.children);
+
+                for (var i = 0; i < _this.target.variables.length; i++) {
+                  _this.target.variables[i]["indexInUI"] = orderedListOfIds[_this.target.variables[i].id];
+                }
+
+                _this.target.variables = _.orderBy(_this.target.variables, ['indexInUI']);
               }
             });
           }
@@ -498,11 +511,21 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
         }, {
           key: "addNewVariable",
           value: function addNewVariable(type) {
-            this.target.variables[this.target.varCounter] = {
+            this.target.variables.push({
+              id: this.target.varCounter,
               type: type
-            };
+            });
             this.target.varCounter += 1;
             this.setSortable();
+            var orderedListOfIds = document.querySelectorAll('#allVariables li[id]');
+
+            for (var i = 0; i < orderedListOfIds.length; i++) {
+              if (this.target.variables[i]) {
+                this.target.variables[i]["indexInUI"] = orderedListOfIds[i];
+              }
+            }
+
+            this.target.variables = _.orderBy(this.target.variables, ['indexInUI']);
           }
         }, {
           key: "addFilterTagBox",
