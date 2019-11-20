@@ -282,7 +282,8 @@ System.register(["app/core/table_model", "moment"], function (_export, _context)
 
               var query = {};
               query = this.templateSrv.replace(target.expr, options.scopedVars, 'pipe');
-              query = query.replace(/\$start/g, secondsAgo);
+              query = query.replace(/"\$start"/g, '"' + secondsAgo.toString() + '"');
+              query = query.replace(/\$start/g, '"' + secondsAgo.toString() + '"');
               query = query.replace(/\$ds/g, options.interval);
               queries.push(query);
             }, this)); // No valid targets, return the empty result to save a round trip.

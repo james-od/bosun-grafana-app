@@ -109,7 +109,7 @@ export class QueryBuilderService {
       }
     }
     constructedQuery += "}";
-      if(orderedVariablesList[index] && orderedVariablesList[index].filtertagBoxes){
+    if(orderedVariablesList[index] && orderedVariablesList[index].filtertagBoxes){
       var onFirstTag = true;
 
       constructedQuery += "{";
