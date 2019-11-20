@@ -7,17 +7,6 @@ export class QueryBuilderService {
     }
   }
 
-  buildWithDefaultOrdering(variables, values){
-    variables = _.orderBy(variables, ['indexInUI'])
-
-    for (var id in variables) {
-      if (variables.hasOwnProperty(id)) {
-        variables[id]["id"] = id;
-        values.push(variables[id]);
-      }
-    }
-  }
-
   variableIsValid(value){
     return value["inputName"] && value["inputName"].startsWith("$")
   }
@@ -28,17 +17,16 @@ export class QueryBuilderService {
 
   substituteFinalQuery(finalQuery, controller) {
     console.log(controller)
-    //Dictionary doesn't guarantee ordering, so convert to array and sort by key
-    var orderedVariablesList = [];
-    const variables = controller.target.variables;
-    this.buildWithDefaultOrdering(variables, orderedVariablesList);
-    orderedVariablesList.sort();
-    //Work upwards
-    orderedVariablesList = orderedVariablesList.reverse();
+    //Ensure ordered and work upwards
+    //Copy to not affect ordering
+    var orderedVariablesList = controller.target.variables.slice();
 
-    var the_service = this;
+    orderedVariablesList.sort((a, b) => (a.indexInUI < b.indexInUI) ? 1 : -1)
+
+    const the_service = this;
 
     var substitutedFinalQuery = finalQuery;
+    var index = 0;
     orderedVariablesList.forEach(function (value) {
       if (value.type === "variable") {
         if (the_service.variableIsValid(value)) {
@@ -50,8 +38,9 @@ export class QueryBuilderService {
         }
       }
       if (value.type === "queryVariable") {
-        substitutedFinalQuery = the_service.substituteVariable(substitutedFinalQuery, value["inputValue"], the_service.buildQueryVariable(value, value.id, controller));
+        substitutedFinalQuery = the_service.substituteVariable(substitutedFinalQuery, value["inputValue"], the_service.buildQueryVariable(orderedVariablesList, value, index, controller));
       }
+      index +=1;
     });
     controller.target.subbedQuery = substitutedFinalQuery;
     return substitutedFinalQuery;
@@ -69,7 +58,7 @@ export class QueryBuilderService {
     }
   }
 
-  buildQueryVariable(queryVariable, id, controller) {
+  buildQueryVariable(orderedVariablesList, queryVariable, index, controller) {
     console.log(queryVariable)
 
     var constructedQuery = "";
@@ -106,30 +95,30 @@ export class QueryBuilderService {
       constructedQuery += ":"
     }
     constructedQuery += queryVariable["metric"] + "{";
-    if(controller.target.grouptagBoxes[id]) {
+    if(orderedVariablesList[index] && orderedVariablesList[index].grouptagBoxes) {
       var onFirstTag = true;
-      for (var tagMapping in controller.target.grouptagBoxes[id]) {
-        if (controller.target.grouptagBoxes[id].hasOwnProperty(tagMapping)) {
+      for (var tagMapping in orderedVariablesList[index].grouptagBoxes) {
+        if (orderedVariablesList[index].grouptagBoxes.hasOwnProperty(tagMapping)) {
           if (!onFirstTag) {
             constructedQuery += ","
           } else {
             onFirstTag = false;
           }
-          constructedQuery += controller.target.grouptagBoxes[id][tagMapping]["key"] + "=" + controller.target.grouptagBoxes[id][tagMapping]["value"]
+          constructedQuery += orderedVariablesList[index].grouptagBoxes[tagMapping]["key"] + "=" + orderedVariablesList[index].grouptagBoxes[tagMapping]["value"]
         }
       }
     }
     constructedQuery += "}";
-    if(controller.target.filtertagBoxes[id]){
+      if(orderedVariablesList[index] && orderedVariablesList[index].filtertagBoxes){
       var onFirstTag = true;
 
       constructedQuery += "{";
-      for (var tagMapping in controller.target.filtertagBoxes[id]) {
-        if (controller.target.filtertagBoxes[id].hasOwnProperty(tagMapping)) {
+      for (var tagMapping in orderedVariablesList[index].filtertagBoxes) {
+        if (orderedVariablesList[index].filtertagBoxes.hasOwnProperty(tagMapping)) {
           if(!onFirstTag){
             constructedQuery += ","
           }else{onFirstTag = false;}
-          constructedQuery += controller.target.filtertagBoxes[id][tagMapping]["key"] + "=" + controller.target.filtertagBoxes[id][tagMapping]["value"]
+          constructedQuery += orderedVariablesList[index].filtertagBoxes[tagMapping]["key"] + "=" + orderedVariablesList[index].filtertagBoxes[tagMapping]["value"]
         }
       }
       constructedQuery += '}"'

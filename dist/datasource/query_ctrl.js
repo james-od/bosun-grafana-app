@@ -274,24 +274,8 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
           }];
           _this2.scope.suggestions = [];
 
-          if (!_this2.target.filtertagBoxes) {
-            _this2.target.filtertagBoxes = {};
-          }
-
-          if (!_this2.target.grouptagBoxes) {
-            _this2.target.grouptagBoxes = {};
-          }
-
           if (!_this2.target.varCounter) {
             _this2.target.varCounter = 0;
-          }
-
-          if (!_this2.target.filterTagBoxCounter) {
-            _this2.target.filterTagBoxCounter = 0;
-          }
-
-          if (!_this2.target.groupTagBoxCounter) {
-            _this2.target.groupTagBoxCounter = 0;
           }
 
           if (!_this2.target.finalQuery) {
@@ -356,13 +340,13 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
           }
         }, {
           key: "deleteTag",
-          value: function deleteTag(queryId, tagId, type) {
+          value: function deleteTag(variableId, tagId, type) {
             if (type === 'filter') {
-              delete this.target.filtertagBoxes[queryId][tagId];
+              delete this.target.variables[variableId].filtertagBoxes[tagId];
             }
 
             if (type === 'group') {
-              delete this.target.grouptagBoxes[queryId][tagId];
+              delete this.target.variables[variableId].grouptagBoxes[tagId];
             }
           }
         }, {
@@ -390,7 +374,7 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
                 var orderedListOfIds = _this.htmlCollectionToListOfIds(evt.to.children);
 
                 for (var i = 0; i < _this.target.variables.length; i++) {
-                  _this.target.variables[i]["indexInUI"] = orderedListOfIds[_this.target.variables[i].id];
+                  _this.target.variables[i].indexInUI = orderedListOfIds.indexOf(_this.target.variables[i].id.toString());
                 }
 
                 _this.target.variables = _.orderBy(_this.target.variables, ['indexInUI']);
@@ -516,42 +500,57 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
               type: type
             });
             this.target.varCounter += 1;
-            this.setSortable();
-            var orderedListOfIds = document.querySelectorAll('#allVariables li[id]');
 
-            for (var i = 0; i < orderedListOfIds.length; i++) {
-              if (this.target.variables[i]) {
-                this.target.variables[i]["indexInUI"] = orderedListOfIds[i];
+            var _this = this; //timeout necessary as ng-repeat doesn't seem to provide a callback when updated
+
+
+            setTimeout(function () {
+              _this.setSortable();
+
+              var orderedListOfIds = _this.htmlCollectionToListOfIds(document.getElementById('allVariables').getElementsByTagName("li"));
+
+              for (var i = 0; i < _this.target.variables.length; i++) {
+                _this.target.variables[i].indexInUI = orderedListOfIds.indexOf(_this.target.variables[i].id.toString());
               }
-            }
 
-            this.target.variables = _.orderBy(this.target.variables, ['indexInUI']);
+              _this.target.variables = _.orderBy(_this.target.variables, ['indexInUI']);
+            }, 100);
           }
         }, {
           key: "addFilterTagBox",
           value: function addFilterTagBox(queryId) {
-            if (!this.target.filtertagBoxes[queryId]) {
-              this.target.filtertagBoxes[queryId] = {};
+            if (!this.target.variables[queryId].filtertagBoxes) {
+              this.target.variables[queryId].filtertagBoxes = {};
             }
 
-            this.target.filtertagBoxes[queryId][this.target.filterTagBoxCounter] = {
+            if (!this.target.variables[queryId].filterTagBoxCounter) {
+              this.target.variables[queryId].filterTagBoxCounter = 0;
+            }
+
+            this.target.variables[queryId].filtertagBoxes[this.target.variables[queryId].filterTagBoxCounter] = {
               key: "",
-              value: ""
+              value: "",
+              editorClosed: false
             };
-            this.target.filterTagBoxCounter += 1;
+            this.target.variables[queryId].filterTagBoxCounter += 1;
           }
         }, {
           key: "addGroupTagBox",
           value: function addGroupTagBox(queryId) {
-            if (!this.target.grouptagBoxes[queryId]) {
-              this.target.grouptagBoxes[queryId] = {};
+            if (!this.target.variables[queryId].grouptagBoxes) {
+              this.target.variables[queryId].grouptagBoxes = {};
             }
 
-            this.target.grouptagBoxes[queryId][this.target.groupTagBoxCounter] = {
+            if (!this.target.variables[queryId].groupTagBoxCounter) {
+              this.target.variables[queryId].groupTagBoxCounter = 0;
+            }
+
+            this.target.variables[queryId].grouptagBoxes[this.target.variables[queryId].groupTagBoxCounter] = {
               key: "",
-              value: ""
+              value: "",
+              editorClosed: false
             };
-            this.target.groupTagBoxCounter += 1;
+            this.target.variables[queryId].groupTagBoxCounter += 1;
           }
         }, {
           key: "addSuggest",

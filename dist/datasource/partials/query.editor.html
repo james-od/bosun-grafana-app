@@ -1,7 +1,7 @@
 <query-editor-row query-ctrl="ctrl">
 
   <ul id="allVariables">
-    <li ng-repeat="(id, variable) in ctrl.target.variables" id="{{id}}">
+    <li ng-repeat="(id, variable) in ctrl.target.variables" id="{{variable.id}}">
       <div ng-if="variable.type == 'variable'">
         <div class="gf-form" style="width:80%;align-items:flex-start;margin-bottom:15px;">
           <label class="gf-form-label query-keyword">
@@ -75,23 +75,23 @@
             <label class="gf-form-label query-keyword">
               Group Tags
             </label>
-            <div class="gf-form" ng-repeat="(tagId, name) in ctrl.target.grouptagBoxes[id]">
-              <label class="gf-form-label" ng-if="ctrl.target.grouptagBoxes[id][tagId]['editorClosed']">
-                {{ctrl.target.grouptagBoxes[id][tagId]['key']}}={{ctrl.target.grouptagBoxes[id][tagId]['value']}}
+            <div class="gf-form" ng-repeat="(tagId, name) in ctrl.target.variables[id].grouptagBoxes">
+              <label class="gf-form-label" ng-if="ctrl.target.variables[id].grouptagBoxes[tagId]['editorClosed']">
+                {{ctrl.target.variables[id].grouptagBoxes[tagId]['key']}}={{ctrl.target.variables[id].grouptagBoxes[tagId]['value']}}
                 <a>
-                  <i class="fa fa-fw fa-pencil" ng-click="ctrl.target.grouptagBoxes[id][tagId]['editorClosed']=false;"></i>
+                  <i class="fa fa-fw fa-pencil" ng-click="ctrl.target.variables[id].grouptagBoxes[tagId]['editorClosed']=false;"></i>
                 </a>
                 <a>
                   <i class="fa fa-fw fa-trash" ng-click="ctrl.deleteTag(id, tagId, 'group')"></i>
                 </a>
               </label>
             </div>
-            <div class="gf-form" ng-repeat="(tagId, name) in ctrl.target.grouptagBoxes[id]">
-              <input ng-if="!ctrl.target.grouptagBoxes[id][tagId]['editorClosed']" class="gf-form-input" style="float:left" ng-model="ctrl.target.grouptagBoxes[id][tagId]['key']" rows="1" spellcheck="false" placeholder="enter tag key" data-min-length=0 data-items=150>
-              <input ng-if="!ctrl.target.grouptagBoxes[id][tagId]['editorClosed']" class="gf-form-input" style="float: left" ng-model="ctrl.target.grouptagBoxes[id][tagId]['value']" rows="1" spellcheck="false" placeholder="enter tag value" data-min-length=0 data-items=150>
-              <button ng-if="!ctrl.target.grouptagBoxes[id][tagId]['editorClosed']" class="gf-form-label">
+            <div class="gf-form" ng-repeat="(tagId, name) in ctrl.target.variables[id].grouptagBoxes">
+              <input ng-if="!ctrl.target.variables[id].grouptagBoxes[tagId]['editorClosed']" class="gf-form-input" style="float:left" ng-model="ctrl.target.variables[id].grouptagBoxes[tagId]['key']" rows="1" spellcheck="false" placeholder="enter tag key" data-min-length=0 data-items=150>
+              <input ng-if="!ctrl.target.variables[id].grouptagBoxes[tagId]['editorClosed']" class="gf-form-input" style="float: left" ng-model="ctrl.target.variables[id].grouptagBoxes[tagId]['value']" rows="1" spellcheck="false" placeholder="enter tag value" data-min-length=0 data-items=150>
+              <button ng-if="!ctrl.target.variables[id].grouptagBoxes[tagId]['editorClosed']" class="gf-form-label">
                 <div class="gf-form" style="width:80%;align-items:flex-start;">
-                  <a ng-click="ctrl.target.grouptagBoxes[id][tagId]['editorClosed']=true;">Add</a>
+                  <a ng-click="ctrl.target.variables[id].grouptagBoxes[tagId]['editorClosed']=true;">Add</a>
                   <a>
                     <i class="fa fa-fw fa-trash" ng-click="ctrl.deleteTag(id, tagId, 'group')"></i>
                   </a>
@@ -102,29 +102,27 @@
               +
             </label>
           </div>
-
-
           <div class="gf-form-inline" style="width:80%;">
             <label class="gf-form-label query-keyword">
               Filtering Tags
             </label>
-            <div class="gf-form" ng-repeat="(tagId, name) in ctrl.target.filtertagBoxes[id]">
-              <label class="gf-form-label" ng-if="ctrl.target.filtertagBoxes[id][tagId]['editorClosed']">
-                {{ctrl.target.filtertagBoxes[id][tagId]['key']}}={{ctrl.target.filtertagBoxes[id][tagId]['value']}}
+            <div class="gf-form" ng-repeat="(tagId, name) in ctrl.target.variables[id].filtertagBoxes">
+              <label class="gf-form-label" ng-if="ctrl.target.variables[id].filtertagBoxes[tagId]['editorClosed']">
+                {{ctrl.target.variables[id].filtertagBoxes[tagId]['key']}}={{ctrl.target.variables[id].filtertagBoxes[tagId]['value']}}
                 <a>
-                  <i class="fa fa-fw fa-pencil" ng-click="ctrl.target.filtertagBoxes[id][tagId]['editorClosed']=false;"></i>
+                  <i class="fa fa-fw fa-pencil" ng-click="ctrl.target.variables[id].filtertagBoxes[tagId]['editorClosed']=false;"></i>
                 </a>
                 <a>
                   <i class="fa fa-fw fa-trash" ng-click="ctrl.deleteTag(id, tagId, 'filter')"></i>
                 </a>
               </label>
             </div>
-            <div class="gf-form" ng-repeat="(tagId, name) in ctrl.target.filtertagBoxes[id]">
-              <input ng-if="!ctrl.target.filtertagBoxes[id][tagId]['editorClosed']" class="gf-form-input" style="float:left" ng-model="ctrl.target.filtertagBoxes[id][tagId]['key']" rows="1" spellcheck="false" placeholder="enter tag key" data-min-length=0 data-items=150>
-              <input ng-if="!ctrl.target.filtertagBoxes[id][tagId]['editorClosed']" class="gf-form-input" style="float: left" ng-model="ctrl.target.filtertagBoxes[id][tagId]['value']" rows="1" spellcheck="false" placeholder="enter tag value" data-min-length=0 data-items=150>
-              <button ng-if="!ctrl.target.filtertagBoxes[id][tagId]['editorClosed']" class="gf-form-label">
+            <div class="gf-form" ng-repeat="(tagId, name) in ctrl.target.variables[id].filtertagBoxes">
+              <input ng-if="!ctrl.target.variables[id].filtertagBoxes[tagId]['editorClosed']" class="gf-form-input" style="float:left" ng-model="ctrl.target.variables[id].filtertagBoxes[tagId]['key']" rows="1" spellcheck="false" placeholder="enter tag key" data-min-length=0 data-items=150>
+              <input ng-if="!ctrl.target.variables[id].filtertagBoxes[tagId]['editorClosed']" class="gf-form-input" style="float: left" ng-model="ctrl.target.variables[id].filtertagBoxes[tagId]['value']" rows="1" spellcheck="false" placeholder="enter tag value" data-min-length=0 data-items=150>
+              <button ng-if="!ctrl.target.variables[id].filtertagBoxes[tagId]['editorClosed']" class="gf-form-label">
                 <div class="gf-form" style="width:80%;align-items:flex-start;">
-                  <a ng-click="ctrl.target.filtertagBoxes[id][tagId]['editorClosed']=true;">Add</a>
+                  <a ng-click="ctrl.target.variables[id].filtertagBoxes[tagId]['editorClosed']=true;">Add</a>
                   <a>
                     <i class="fa fa-fw fa-trash" ng-click="ctrl.deleteTag(id, tagId, 'filter')"></i>
                   </a>

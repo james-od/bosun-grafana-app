@@ -51,20 +51,8 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
       {func: 'window', type:'seriesSet', args:{'query': 'string', 'duration': 'string', 'period': 'string', 'num': 'scalar', 'funcName': 'string'}},
     ];
     this.scope.suggestions = [];
-    if(!this.target.filtertagBoxes){
-      this.target.filtertagBoxes = {};
-    }
-    if(!this.target.grouptagBoxes) {
-      this.target.grouptagBoxes = {};
-    }
     if(!this.target.varCounter){
       this.target.varCounter = 0;
-    }
-    if(!this.target.filterTagBoxCounter){
-      this.target.filterTagBoxCounter = 0;
-    }
-    if(!this.target.groupTagBoxCounter) {
-      this.target.groupTagBoxCounter = 0;
     }
     if(!this.target.finalQuery){
       if(this.target.expr){
@@ -84,7 +72,7 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
       //Give time for page to load before setting elements as sortable
       setTimeout(function(){
         _this.setSortable();
-        }, 2000);
+      }, 2000);
     });
     try{
       this.updateFinalQuery(this.target.finalQuery);
@@ -104,7 +92,7 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
   }
 
   deleteVariable(id) {
-    var tmp = []
+    var tmp = [];
     for (var i = 0; i < this.target.variables.length; i++) {
       if (this.target.variables[i].id.toString() !== id.toString()) {
         tmp.push(this._objectWithoutProperties(this.target.variables[i], ["$$hashKey"]))
@@ -113,17 +101,17 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     this.target.variables = tmp;
   }
 
-  deleteTag(queryId, tagId, type){
+  deleteTag(variableId, tagId, type){
     if(type === 'filter'){
-      delete this.target.filtertagBoxes[queryId][tagId]
+      delete this.target.variables[variableId].filtertagBoxes[tagId]
     }
     if(type === 'group'){
-      delete this.target.grouptagBoxes[queryId][tagId]
+      delete this.target.variables[variableId].grouptagBoxes[tagId]
     }
   }
 
   htmlCollectionToListOfIds(htmlCollection){
-    var ret = []
+    var ret = [];
     for(var i=0; i<htmlCollection.length; i++){
       ret.push(htmlCollection[i].id)
     }
@@ -139,7 +127,7 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
         var orderedListOfIds = _this.htmlCollectionToListOfIds(evt.to.children);
 
         for(var i=0; i<_this.target.variables.length; i++){
-          _this.target.variables[i]["indexInUI"] = orderedListOfIds[_this.target.variables[i].id]
+          _this.target.variables[i].indexInUI = orderedListOfIds.indexOf(_this.target.variables[i].id.toString())
         }
         _this.target.variables = _.orderBy(_this.target.variables, ['indexInUI'])
       }
@@ -235,33 +223,43 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
   addNewVariable(type) {
     this.target.variables.push({id: this.target.varCounter, type: type});
     this.target.varCounter += 1;
-    this.setSortable();
+    var _this = this;
 
-    var orderedListOfIds = document.querySelectorAll('#allVariables li[id]');
+    //timeout necessary as ng-repeat doesn't seem to provide a callback when updated
+    setTimeout(function(){
+      _this.setSortable();
 
-    for(var i=0; i<orderedListOfIds.length; i++){
-      if(this.target.variables[i]){
-        this.target.variables[i]["indexInUI"] = orderedListOfIds[i]
+      var orderedListOfIds = _this.htmlCollectionToListOfIds(document.getElementById('allVariables').getElementsByTagName("li"));
+      for(var i=0; i<_this.target.variables.length; i++){
+        _this.target.variables[i].indexInUI = orderedListOfIds.indexOf(_this.target.variables[i].id.toString())
       }
-    }
 
-    this.target.variables = _.orderBy(this.target.variables, ['indexInUI'])
+      _this.target.variables = _.orderBy(_this.target.variables, ['indexInUI'])
+    }, 100);
+
+
   }
 
   addFilterTagBox(queryId) {
-    if(!this.target.filtertagBoxes[queryId]){
-      this.target.filtertagBoxes[queryId] = {}
+    if(!this.target.variables[queryId].filtertagBoxes){
+      this.target.variables[queryId].filtertagBoxes = {}
     }
-    this.target.filtertagBoxes[queryId][this.target.filterTagBoxCounter] = {key: "", value: ""};
-    this.target.filterTagBoxCounter += 1;
+    if(!this.target.variables[queryId].filterTagBoxCounter){
+      this.target.variables[queryId].filterTagBoxCounter = 0;
+    }
+    this.target.variables[queryId].filtertagBoxes[this.target.variables[queryId].filterTagBoxCounter] = {key: "", value: "", editorClosed: false};
+    this.target.variables[queryId].filterTagBoxCounter += 1;
   }
 
   addGroupTagBox(queryId) {
-    if(!this.target.grouptagBoxes[queryId]){
-      this.target.grouptagBoxes[queryId] = {};
+    if(!this.target.variables[queryId].grouptagBoxes){
+      this.target.variables[queryId].grouptagBoxes = {}
     }
-    this.target.grouptagBoxes[queryId][this.target.groupTagBoxCounter] = {key: "", value: ""};
-    this.target.groupTagBoxCounter += 1;
+    if(!this.target.variables[queryId].groupTagBoxCounter){
+      this.target.variables[queryId].groupTagBoxCounter = 0;
+    }
+    this.target.variables[queryId].grouptagBoxes[this.target.variables[queryId].groupTagBoxCounter] = {key: "", value: "", editorClosed: false};
+    this.target.variables[queryId].groupTagBoxCounter += 1;
   }
 
   addSuggest() {
