@@ -75,6 +75,7 @@ export class BosunDatasource {
         var exprDate = options.range.to.utc().format('YYYY-MM-DD');
         var exprTime = options.range.to.utc().format('HH:mm:ss');
         var url = this.url + '/api/expr?date=' + encodeURIComponent(exprDate) + '&time=' + encodeURIComponent(exprTime);
+        this.postQuery = query;
         return this.bosunRequest({
             url: url,
             method: 'POST',
@@ -189,7 +190,6 @@ export class BosunDatasource {
                 return;
             }
             var query = {};
-
             query = this.templateSrv.replace(target.expr, options.scopedVars, 'pipe');
             query = query.replace(/"\$start"/g, '"' + secondsAgo.toString() + '"');
             query = query.replace(/\$start/g, '"' + secondsAgo.toString() + '"');
