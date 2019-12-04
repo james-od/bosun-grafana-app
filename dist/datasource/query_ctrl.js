@@ -112,7 +112,6 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
           _this2.uiSegmentSrv = uiSegmentSrv;
           _this2.target.expandHelper = 0;
           _this2.target.target = _this2.target.target || 'Bosun Query';
-          _this2.setSortable = _this2.setSortable.bind(_assertThisInitialized(_this2));
           _this2.deleteVariable = _this2.deleteVariable.bind(_assertThisInitialized(_this2));
           _this2.suggestMetrics = _this2.suggestMetrics.bind(_assertThisInitialized(_this2));
           _this2.addSuggest = _this2.addSuggest.bind(_assertThisInitialized(_this2));
@@ -122,8 +121,7 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
           _this2.suggestTagValues = _this2.suggestTagValues.bind(_assertThisInitialized(_this2));
           _this2.addNewVariable = _this2.addNewVariable.bind(_assertThisInitialized(_this2));
           _this2.getMetricSuggestions = _this2.getMetricSuggestions.bind(_assertThisInitialized(_this2));
-          _this2.addFilterTagBox = _this2.addFilterTagBox.bind(_assertThisInitialized(_this2));
-          _this2.addGroupTagBox = _this2.addGroupTagBox.bind(_assertThisInitialized(_this2));
+          _this2.addTagBox = _this2.addTagBox.bind(_assertThisInitialized(_this2));
           _this2.filterTypes = ["Group By", "Filter"];
 
           if (!_this2.target.variables) {
@@ -287,7 +285,6 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             }
           }
 
-          console.log(_this2.target.finalQuery);
           _this2.target.subbedQuery = "";
 
           if (!_this2.target.flags) {
@@ -313,8 +310,8 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
         }
 
         _createClass(BosunDatasourceQueryCtrl, [{
-          key: "_objectWithoutProperties",
-          value: function _objectWithoutProperties(obj, keys) {
+          key: "objectWithoutProperties",
+          value: function objectWithoutProperties(obj, keys) {
             var target = {};
 
             for (var i in obj) {
@@ -324,30 +321,6 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             }
 
             return target;
-          }
-        }, {
-          key: "deleteVariable",
-          value: function deleteVariable(id) {
-            var tmp = [];
-
-            for (var i = 0; i < this.target.variables.length; i++) {
-              if (this.target.variables[i].id.toString() !== id.toString()) {
-                tmp.push(this._objectWithoutProperties(this.target.variables[i], ["$$hashKey"]));
-              }
-            }
-
-            this.target.variables = tmp;
-          }
-        }, {
-          key: "deleteTag",
-          value: function deleteTag(variableId, tagId, type) {
-            if (type === 'filter') {
-              delete this.target.variables[variableId].filtertagBoxes[tagId];
-            }
-
-            if (type === 'group') {
-              delete this.target.variables[variableId].grouptagBoxes[tagId];
-            }
           }
         }, {
           key: "htmlCollectionToListOfIds",
@@ -361,25 +334,119 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             return ret;
           }
         }, {
+          key: "getVariablesFromUI",
+          value: function getVariablesFromUI() {
+            return this.htmlCollectionToListOfIds(document.getElementById('allVariables').getElementsByTagName("li"));
+          }
+        }, {
+          key: "ensureOrdering",
+          value: function ensureOrdering(variables) {
+            this.setSortable();
+            var orderedListOfIds = this.getVariablesFromUI();
+
+            for (var i = 0; i < variables.length; i++) {
+              variables[i].indexInUI = orderedListOfIds.indexOf(variables[i].id.toString());
+            }
+
+            return _.orderBy(variables, ['indexInUI']);
+          }
+        }, {
           key: "setSortable",
           value: function setSortable() {
             var el = document.getElementById('allVariables');
 
             var _this = this;
 
-            var sortable = Sortable.create(el, {
-              onUpdate: function onUpdate(evt) {
-                console.log(evt.to.children);
-
-                var orderedListOfIds = _this.htmlCollectionToListOfIds(evt.to.children);
-
-                for (var i = 0; i < _this.target.variables.length; i++) {
-                  _this.target.variables[i].indexInUI = orderedListOfIds.indexOf(_this.target.variables[i].id.toString());
-                }
-
-                _this.target.variables = _.orderBy(_this.target.variables, ['indexInUI']);
+            Sortable.create(el, {
+              onUpdate: function onUpdate() {
+                _this.target.variables = _this.ensureOrdering(_this.target.variables);
               }
             });
+          }
+        }, {
+          key: "getMetricSuggestions",
+          value: function getMetricSuggestions(typeahead) {
+            if (!this.datasource.openTSDBUrl) {
+              throw ReferenceError("Missing OpenTSDB URL");
+            }
+
+            var request = new Request(this.datasource.openTSDBUrl + "/suggest?type=metrics&q=" + typeahead);
+            var the_scope = this.scope;
+            var req = fetch(request).then(function (response) {
+              return response.json();
+            }).then(function (responseSuggestions) {
+              the_scope.suggestions = responseSuggestions;
+            })["catch"](function (error) {
+              throw error;
+            });
+            return req;
+          }
+        }, {
+          key: "deleteVariable",
+          value: function deleteVariable(id) {
+            //Angular keeps track of objects in ng-repeat, removing $$hashkey prevents issues with ordering after deleting.
+            var tmp = [];
+
+            for (var i = 0; i < this.target.variables.length; i++) {
+              if (this.target.variables[i].id.toString() !== id.toString()) {
+                tmp.push(this.objectWithoutProperties(this.target.variables[i], ["$$hashKey"]));
+              }
+            }
+
+            this.target.variables = tmp;
+          }
+        }, {
+          key: "deleteTag",
+          value: function deleteTag(variableId, tagId, type) {
+            delete this.target.variables[variableId][type + "tagBoxes"][tagId];
+          }
+        }, {
+          key: "addNewVariable",
+          value: function addNewVariable(type) {
+            var variables = this.target.variables;
+            var defaultVariable = {
+              id: this.target.varCounter,
+              type: type
+            };
+            variables.push(defaultVariable);
+            this.target.varCounter += 1;
+
+            var _this = this; //timeout necessary as ng-repeat doesn't seem to provide a callback when updated
+
+
+            setTimeout(function () {
+              variables = _this.ensureOrdering(variables);
+            }, 100);
+          }
+        }, {
+          key: "addTagBox",
+          value: function addTagBox(queryId, type) {
+            var defaultTagBox = {
+              key: "",
+              value: "",
+              editorClosed: false
+            };
+            var queryVariable = this.target.variables[queryId];
+
+            if (!queryVariable[type + "tagBoxes"]) {
+              queryVariable[type + "tagBoxes"] = {};
+            }
+
+            if (!queryVariable[type + "TagBoxCounter"]) {
+              queryVariable[type + "TagBoxCounter"] = 0;
+            }
+
+            queryVariable[type + "tagBoxes"][queryVariable[type + "TagBoxCounter"]] = defaultTagBox;
+            queryVariable[type + "TagBoxCounter"] += 1;
+          }
+        }, {
+          key: "updateFinalQuery",
+          value: function updateFinalQuery(finalQuery) {
+            var qbs = new QueryBuilderService();
+            this.target.expr = qbs.substituteFinalQuery(finalQuery, this);
+            this.panelCtrl.refresh();
+            this.target.finalQuery = finalQuery;
+            return qbs.substituteFinalQuery(finalQuery, this);
           }
         }, {
           key: "suggestMetrics",
@@ -464,93 +531,6 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
           key: "onChangeInternal",
           value: function onChangeInternal() {
             this.panelCtrl.refresh(); // Asks the panel to refresh data.
-          }
-        }, {
-          key: "getMetricSuggestions",
-          value: function getMetricSuggestions(typeahead) {
-            if (!this.datasource.openTSDBUrl) {
-              throw ReferenceError("Missing OpenTSDB URL");
-            }
-
-            var request = new Request(this.datasource.openTSDBUrl + "/suggest?type=metrics&q=" + typeahead);
-            var the_scope = this.scope;
-            var req = fetch(request).then(function (response) {
-              return response.json();
-            }).then(function (responseSuggestions) {
-              the_scope.suggestions = responseSuggestions;
-            })["catch"](function (error) {
-              throw error;
-            });
-            return req;
-          }
-        }, {
-          key: "updateFinalQuery",
-          value: function updateFinalQuery(finalQuery) {
-            var qbs = new QueryBuilderService();
-            this.target.expr = qbs.substituteFinalQuery(finalQuery, this);
-            this.panelCtrl.refresh();
-            this.target.finalQuery = finalQuery;
-            return qbs.substituteFinalQuery(finalQuery, this);
-          }
-        }, {
-          key: "addNewVariable",
-          value: function addNewVariable(type) {
-            this.target.variables.push({
-              id: this.target.varCounter,
-              type: type
-            });
-            this.target.varCounter += 1;
-
-            var _this = this; //timeout necessary as ng-repeat doesn't seem to provide a callback when updated
-
-
-            setTimeout(function () {
-              _this.setSortable();
-
-              var orderedListOfIds = _this.htmlCollectionToListOfIds(document.getElementById('allVariables').getElementsByTagName("li"));
-
-              for (var i = 0; i < _this.target.variables.length; i++) {
-                _this.target.variables[i].indexInUI = orderedListOfIds.indexOf(_this.target.variables[i].id.toString());
-              }
-
-              _this.target.variables = _.orderBy(_this.target.variables, ['indexInUI']);
-            }, 100);
-          }
-        }, {
-          key: "addFilterTagBox",
-          value: function addFilterTagBox(queryId) {
-            if (!this.target.variables[queryId].filtertagBoxes) {
-              this.target.variables[queryId].filtertagBoxes = {};
-            }
-
-            if (!this.target.variables[queryId].filterTagBoxCounter) {
-              this.target.variables[queryId].filterTagBoxCounter = 0;
-            }
-
-            this.target.variables[queryId].filtertagBoxes[this.target.variables[queryId].filterTagBoxCounter] = {
-              key: "",
-              value: "",
-              editorClosed: false
-            };
-            this.target.variables[queryId].filterTagBoxCounter += 1;
-          }
-        }, {
-          key: "addGroupTagBox",
-          value: function addGroupTagBox(queryId) {
-            if (!this.target.variables[queryId].grouptagBoxes) {
-              this.target.variables[queryId].grouptagBoxes = {};
-            }
-
-            if (!this.target.variables[queryId].groupTagBoxCounter) {
-              this.target.variables[queryId].groupTagBoxCounter = 0;
-            }
-
-            this.target.variables[queryId].grouptagBoxes[this.target.variables[queryId].groupTagBoxCounter] = {
-              key: "",
-              value: "",
-              editorClosed: false
-            };
-            this.target.variables[queryId].groupTagBoxCounter += 1;
           }
         }, {
           key: "addSuggest",

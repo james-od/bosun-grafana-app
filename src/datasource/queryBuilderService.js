@@ -16,12 +16,11 @@ export class QueryBuilderService {
   }
 
   substituteFinalQuery(finalQuery, controller) {
-    console.log(controller)
     //Ensure ordered and work upwards
     //Copy to not affect ordering
     var orderedVariablesList = controller.target.variables.slice();
 
-    orderedVariablesList.sort((a, b) => (a.indexInUI < b.indexInUI) ? 1 : -1)
+    orderedVariablesList.sort((a, b) => (a.indexInUI < b.indexInUI) ? 1 : -1);
 
     const the_service = this;
 
@@ -31,14 +30,25 @@ export class QueryBuilderService {
       if (value.type === "variable") {
         if (the_service.variableIsValid(value)) {
           if (value["inputValue"] === undefined) {
-            substitutedFinalQuery = the_service.substituteVariable(substitutedFinalQuery, value["inputName"], "");
+            substitutedFinalQuery = the_service.substituteVariable(
+              substitutedFinalQuery,
+              value["inputName"],
+              ""
+            );
           } else {
-            substitutedFinalQuery = the_service.substituteVariable(substitutedFinalQuery, value["inputName"], value["inputValue"]);
+            substitutedFinalQuery = the_service.substituteVariable(
+              substitutedFinalQuery,
+              value["inputName"],
+              value["inputValue"]
+            );
           }
         }
       }
       if (value.type === "queryVariable") {
-        substitutedFinalQuery = the_service.substituteVariable(substitutedFinalQuery, value["inputValue"], the_service.buildQueryVariable(orderedVariablesList, value, index, controller));
+        substitutedFinalQuery = the_service.substituteVariable(
+          substitutedFinalQuery, value["inputValue"],
+          the_service.buildQueryVariable(orderedVariablesList, value, index, controller)
+        );
       }
       index +=1;
     });
@@ -58,73 +68,67 @@ export class QueryBuilderService {
     }
   }
 
-  buildQueryVariable(orderedVariablesList, queryVariable, index, controller) {
-    console.log(queryVariable)
-
-    var constructedQuery = "";
+  ensureMinimalQuery(queryVariable){
     if(!queryVariable){throw new ReferenceError("No query parameters found")}
     if(!queryVariable["queryFunction"]){throw new ReferenceError("Query function not set")}
     if(!queryVariable["queryAgg"]){throw new ReferenceError("Query aggregator not set")}
     if(!queryVariable["metric"]){throw new ReferenceError("Query metric not set")}
+  }
 
-    constructedQuery += queryVariable["queryFunction"] + '("';
-    constructedQuery += queryVariable["queryAgg"] + ":";
+  addParamToQuery(queryVariable, prepend, param, append){
+    if(queryVariable[param]){
+      return prepend + queryVariable[param] + append;
+    }
+    return "";
+  }
+
+  addTagsToQuery(constructedQuery, orderedVariablesList, index, tagType){
+    var onFirstTag = true;
+    for (var tagMapping in orderedVariablesList[index][tagType+"tagBoxes"]) {
+      if (orderedVariablesList[index][tagType+"tagBoxes"].hasOwnProperty(tagMapping)) {
+        if (!onFirstTag) {
+          constructedQuery += ","
+        } else {
+          onFirstTag = false;
+        }
+        constructedQuery +=
+          orderedVariablesList[index][tagType+"tagBoxes"][tagMapping]["key"]
+          + "="
+          + orderedVariablesList[index][tagType+"tagBoxes"][tagMapping]["value"]
+      }
+    }
+    return constructedQuery;
+  }
+
+  buildQueryVariable(orderedVariablesList, queryVariable, index) {
+
+    this.ensureMinimalQuery(queryVariable);
+
+    var constructedQuery = queryVariable["queryFunction"] + '("' + queryVariable["queryAgg"] + ":";
     if(queryVariable["downsampleTime"]){
       constructedQuery += queryVariable["downsampleTime"];
-      if(queryVariable["downsampleAgg"]){
-        constructedQuery += "-" + queryVariable["downsampleAgg"]
-      }
-      if(queryVariable["fillPolicy"]){
-        constructedQuery += "-" + queryVariable["fillPolicy"]
-      }
+      constructedQuery += this.addParamToQuery(queryVariable, "-", "downsampleAgg", "");
     }else{
-      if(queryVariable["downsampleAgg"]){
-        constructedQuery += queryVariable["downsampleAgg"]
-      }
-      if(queryVariable["fillPolicy"]){
-        constructedQuery += "-" + queryVariable["fillPolicy"]
-      }
+      constructedQuery += this.addParamToQuery(queryVariable, "", "downsampleAgg", "");
     }
-    if(queryVariable["conversionFlag"]){
-      constructedQuery += ":" + queryVariable["conversionFlag"]
-    }
-    if(queryVariable["flags"]){
-      constructedQuery += ":" + queryVariable["flags"]
-    }
+    constructedQuery += this.addParamToQuery(queryVariable, "-", "fillPolicy", "");
+    constructedQuery += this.addParamToQuery(queryVariable, ":", "conversionFlag", "");
+    constructedQuery += this.addParamToQuery(queryVariable, ":", "flags", "");
+
     if(queryVariable["downsampleTime"] || queryVariable["downsampleAgg"] || queryVariable["fillPolicy"]){
       constructedQuery += ":"
     }
     constructedQuery += queryVariable["metric"] + "{";
-    if(orderedVariablesList[index] && orderedVariablesList[index].grouptagBoxes) {
-      var onFirstTag = true;
-      for (var tagMapping in orderedVariablesList[index].grouptagBoxes) {
-        if (orderedVariablesList[index].grouptagBoxes.hasOwnProperty(tagMapping)) {
-          if (!onFirstTag) {
-            constructedQuery += ","
-          } else {
-            onFirstTag = false;
-          }
-          constructedQuery += orderedVariablesList[index].grouptagBoxes[tagMapping]["key"] + "=" + orderedVariablesList[index].grouptagBoxes[tagMapping]["value"]
-        }
-      }
-    }
-    constructedQuery += "}";
-    if(orderedVariablesList[index] && orderedVariablesList[index].filtertagBoxes){
-      var onFirstTag = true;
 
-      constructedQuery += "{";
-      for (var tagMapping in orderedVariablesList[index].filtertagBoxes) {
-        if (orderedVariablesList[index].filtertagBoxes.hasOwnProperty(tagMapping)) {
-          if(!onFirstTag){
-            constructedQuery += ","
-          }else{onFirstTag = false;}
-          constructedQuery += orderedVariablesList[index].filtertagBoxes[tagMapping]["key"] + "=" + orderedVariablesList[index].filtertagBoxes[tagMapping]["value"]
-        }
-      }
-      constructedQuery += '}"'
-    }else{
-      constructedQuery += '{}"'
+    if(orderedVariablesList[index] && orderedVariablesList[index].grouptagBoxes) {
+      constructedQuery = this.addTagsToQuery(constructedQuery, orderedVariablesList, index, 'group')
     }
+    constructedQuery += "}{";
+    if(orderedVariablesList[index] && orderedVariablesList[index].filtertagBoxes){
+      constructedQuery = this.addTagsToQuery(constructedQuery, orderedVariablesList, index, 'filter');
+    }
+    constructedQuery += '}"'
+
     const queryVar = queryVariable["queryFunction"]
     if(queryVar === "q" || queryVar === "change" || queryVar === "count") {
       constructedQuery += this.addQueryArg(queryVariable, "startDuration");
@@ -142,7 +146,6 @@ export class QueryBuilderService {
       constructedQuery += this.addQueryArg(queryVariable, "funcName");
     }
     constructedQuery += ")";
-    console.log(constructedQuery);
     return constructedQuery;
   }
 }

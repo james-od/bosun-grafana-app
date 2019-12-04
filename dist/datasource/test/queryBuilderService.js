@@ -256,6 +256,113 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
         };
         expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe("over(\"avg:1h-avg:example.metric{}{tagName=hello1}\", \"7d\", \"period\", 3)");
       });
+      test('Group tags', function () {
+        var qbs = new QueryBuilderService();
+        var myMock = jest.fn();
+        var mocked_this = new myMock();
+        mocked_this.target = {
+          variables: [{
+            id: 0,
+            type: "variable",
+            inputName: "$time",
+            inputValue: "1h",
+            indexInUI: 0
+          }, {
+            id: 1,
+            type: "variable",
+            inputName: "$tagValue",
+            inputValue: "hello1",
+            indexInUI: 1
+          }, {
+            id: 2,
+            type: "queryVariable",
+            inputValue: "$q",
+            queryFunction: "over",
+            metric: "example.metric",
+            queryAgg: "avg",
+            downsampleTime: "$time",
+            downsampleAgg: "avg",
+            duration: "7d",
+            num: "3",
+            period: "period",
+            grouptagBoxes: {
+              0: {
+                key: "tagName1",
+                value: "$tagValue"
+              },
+              1: {
+                key: "tagName2",
+                value: "hello2"
+              }
+            },
+            filtertagBoxes: {},
+            indexInUI: 2
+          }],
+          variableOrder: []
+        };
+        expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe("over(\"avg:1h-avg:example.metric{tagName1=hello1,tagName2=hello2}{}\", \"7d\", \"period\", 3)");
+      });
+      test('Multiple of both tag types', function () {
+        var qbs = new QueryBuilderService();
+        var myMock = jest.fn();
+        var mocked_this = new myMock();
+        mocked_this.target = {
+          variables: [{
+            id: 0,
+            type: "variable",
+            inputName: "$time",
+            inputValue: "1h",
+            indexInUI: 0
+          }, {
+            id: 1,
+            type: "variable",
+            inputName: "$tagValue1",
+            inputValue: "hello1",
+            indexInUI: 1
+          }, {
+            id: 1,
+            type: "variable",
+            inputName: "$tagValue2",
+            inputValue: "hello2",
+            indexInUI: 1
+          }, {
+            id: 2,
+            type: "queryVariable",
+            inputValue: "$q",
+            queryFunction: "over",
+            metric: "example.metric",
+            queryAgg: "avg",
+            downsampleTime: "$time",
+            downsampleAgg: "avg",
+            duration: "7d",
+            num: "3",
+            period: "period",
+            grouptagBoxes: {
+              0: {
+                key: "groupTag1",
+                value: "$tagValue1"
+              },
+              1: {
+                key: "groupTag2",
+                value: "a"
+              }
+            },
+            filtertagBoxes: {
+              0: {
+                key: "filterTag1",
+                value: "b"
+              },
+              1: {
+                key: "filterTag2",
+                value: "$tagValue2"
+              }
+            },
+            indexInUI: 2
+          }],
+          variableOrder: []
+        };
+        expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe("over(\"avg:1h-avg:example.metric{groupTag1=hello1,groupTag2=a}{filterTag1=b,filterTag2=hello2}\", \"7d\", \"period\", 3)");
+      });
     }
   };
 });

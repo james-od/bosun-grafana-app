@@ -56,9 +56,8 @@ System.register([], function (_export, _context) {
         }, {
           key: "substituteFinalQuery",
           value: function substituteFinalQuery(finalQuery, controller) {
-            console.log(controller); //Ensure ordered and work upwards
+            //Ensure ordered and work upwards
             //Copy to not affect ordering
-
             var orderedVariablesList = controller.target.variables.slice();
             orderedVariablesList.sort(function (a, b) {
               return a.indexInUI < b.indexInUI ? 1 : -1;
@@ -100,11 +99,8 @@ System.register([], function (_export, _context) {
             }
           }
         }, {
-          key: "buildQueryVariable",
-          value: function buildQueryVariable(orderedVariablesList, queryVariable, index, controller) {
-            console.log(queryVariable);
-            var constructedQuery = "";
-
+          key: "ensureMinimalQuery",
+          value: function ensureMinimalQuery(queryVariable) {
             if (!queryVariable) {
               throw new ReferenceError("No query parameters found");
             }
@@ -120,37 +116,51 @@ System.register([], function (_export, _context) {
             if (!queryVariable["metric"]) {
               throw new ReferenceError("Query metric not set");
             }
+          }
+        }, {
+          key: "addParamToQuery",
+          value: function addParamToQuery(queryVariable, prepend, param, append) {
+            if (queryVariable[param]) {
+              return prepend + queryVariable[param] + append;
+            }
 
-            constructedQuery += queryVariable["queryFunction"] + '("';
-            constructedQuery += queryVariable["queryAgg"] + ":";
+            return "";
+          }
+        }, {
+          key: "addTagsToQuery",
+          value: function addTagsToQuery(constructedQuery, orderedVariablesList, index, tagType) {
+            var onFirstTag = true;
+
+            for (var tagMapping in orderedVariablesList[index][tagType + "tagBoxes"]) {
+              if (orderedVariablesList[index][tagType + "tagBoxes"].hasOwnProperty(tagMapping)) {
+                if (!onFirstTag) {
+                  constructedQuery += ",";
+                } else {
+                  onFirstTag = false;
+                }
+
+                constructedQuery += orderedVariablesList[index][tagType + "tagBoxes"][tagMapping]["key"] + "=" + orderedVariablesList[index][tagType + "tagBoxes"][tagMapping]["value"];
+              }
+            }
+
+            return constructedQuery;
+          }
+        }, {
+          key: "buildQueryVariable",
+          value: function buildQueryVariable(orderedVariablesList, queryVariable, index) {
+            this.ensureMinimalQuery(queryVariable);
+            var constructedQuery = queryVariable["queryFunction"] + '("' + queryVariable["queryAgg"] + ":";
 
             if (queryVariable["downsampleTime"]) {
               constructedQuery += queryVariable["downsampleTime"];
-
-              if (queryVariable["downsampleAgg"]) {
-                constructedQuery += "-" + queryVariable["downsampleAgg"];
-              }
-
-              if (queryVariable["fillPolicy"]) {
-                constructedQuery += "-" + queryVariable["fillPolicy"];
-              }
+              constructedQuery += this.addParamToQuery(queryVariable, "-", "downsampleAgg", "");
             } else {
-              if (queryVariable["downsampleAgg"]) {
-                constructedQuery += queryVariable["downsampleAgg"];
-              }
-
-              if (queryVariable["fillPolicy"]) {
-                constructedQuery += "-" + queryVariable["fillPolicy"];
-              }
+              constructedQuery += this.addParamToQuery(queryVariable, "", "downsampleAgg", "");
             }
 
-            if (queryVariable["conversionFlag"]) {
-              constructedQuery += ":" + queryVariable["conversionFlag"];
-            }
-
-            if (queryVariable["flags"]) {
-              constructedQuery += ":" + queryVariable["flags"];
-            }
+            constructedQuery += this.addParamToQuery(queryVariable, "-", "fillPolicy", "");
+            constructedQuery += this.addParamToQuery(queryVariable, ":", "conversionFlag", "");
+            constructedQuery += this.addParamToQuery(queryVariable, ":", "flags", "");
 
             if (queryVariable["downsampleTime"] || queryVariable["downsampleAgg"] || queryVariable["fillPolicy"]) {
               constructedQuery += ":";
@@ -159,44 +169,16 @@ System.register([], function (_export, _context) {
             constructedQuery += queryVariable["metric"] + "{";
 
             if (orderedVariablesList[index] && orderedVariablesList[index].grouptagBoxes) {
-              var onFirstTag = true;
-
-              for (var tagMapping in orderedVariablesList[index].grouptagBoxes) {
-                if (orderedVariablesList[index].grouptagBoxes.hasOwnProperty(tagMapping)) {
-                  if (!onFirstTag) {
-                    constructedQuery += ",";
-                  } else {
-                    onFirstTag = false;
-                  }
-
-                  constructedQuery += orderedVariablesList[index].grouptagBoxes[tagMapping]["key"] + "=" + orderedVariablesList[index].grouptagBoxes[tagMapping]["value"];
-                }
-              }
+              constructedQuery = this.addTagsToQuery(constructedQuery, orderedVariablesList, index, 'group');
             }
 
-            constructedQuery += "}";
+            constructedQuery += "}{";
 
             if (orderedVariablesList[index] && orderedVariablesList[index].filtertagBoxes) {
-              var onFirstTag = true;
-              constructedQuery += "{";
-
-              for (var tagMapping in orderedVariablesList[index].filtertagBoxes) {
-                if (orderedVariablesList[index].filtertagBoxes.hasOwnProperty(tagMapping)) {
-                  if (!onFirstTag) {
-                    constructedQuery += ",";
-                  } else {
-                    onFirstTag = false;
-                  }
-
-                  constructedQuery += orderedVariablesList[index].filtertagBoxes[tagMapping]["key"] + "=" + orderedVariablesList[index].filtertagBoxes[tagMapping]["value"];
-                }
-              }
-
-              constructedQuery += '}"';
-            } else {
-              constructedQuery += '{}"';
+              constructedQuery = this.addTagsToQuery(constructedQuery, orderedVariablesList, index, 'filter');
             }
 
+            constructedQuery += '}"';
             var queryVar = queryVariable["queryFunction"];
 
             if (queryVar === "q" || queryVar === "change" || queryVar === "count") {
@@ -218,7 +200,6 @@ System.register([], function (_export, _context) {
             }
 
             constructedQuery += ")";
-            console.log(constructedQuery);
             return constructedQuery;
           }
         }]);
