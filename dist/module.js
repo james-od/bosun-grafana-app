@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-System.register(['./components/config'], function (_export, _context) {
+System.register(["./components/config"], function (_export, _context) {
   "use strict";
 
   var BosunAppConfigCtrl;
@@ -9,7 +9,7 @@ System.register(['./components/config'], function (_export, _context) {
       BosunAppConfigCtrl = _componentsConfig.BosunAppConfigCtrl;
     }],
     execute: function () {
-      _export('ConfigCtrl', BosunAppConfigCtrl);
+      _export("ConfigCtrl", BosunAppConfigCtrl);
     }
   };
 });
