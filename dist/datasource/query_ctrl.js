@@ -3,7 +3,7 @@
 System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/Sortable.min", "./queryBuilderService"], function (_export, _context) {
   "use strict";
 
-  var QueryCtrl, Sortable, QueryBuilderService, BosunDatasourceQueryCtrl;
+  var QueryCtrl, Sortable, substituteFinalQuery, BosunDatasourceQueryCtrl;
 
   function _typeof(obj) {
     if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
@@ -94,20 +94,19 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
     }, function (_cssQueryEditorCss) {}, function (_externalSortableMin) {
       Sortable = _externalSortableMin.default;
     }, function (_queryBuilderService) {
-      QueryBuilderService = _queryBuilderService.QueryBuilderService;
+      substituteFinalQuery = _queryBuilderService.substituteFinalQuery;
     }],
     execute: function () {
       _export("BosunDatasourceQueryCtrl", BosunDatasourceQueryCtrl = function (_QueryCtrl) {
         _inherits(BosunDatasourceQueryCtrl, _QueryCtrl);
 
-        function BosunDatasourceQueryCtrl($scope, $injector, uiSegmentSrv, $sce) {
+        function BosunDatasourceQueryCtrl($scope, $injector, uiSegmentSrv) {
           var _this2;
 
           _classCallCheck(this, BosunDatasourceQueryCtrl);
 
-          _this2 = _possibleConstructorReturn(this, _getPrototypeOf(BosunDatasourceQueryCtrl).call(this, $scope, $injector, $sce));
+          _this2 = _possibleConstructorReturn(this, _getPrototypeOf(BosunDatasourceQueryCtrl).call(this, $scope, $injector));
           _this2.scope = $scope;
-          _this2.sce = $sce;
           _this2.queryHelper = {};
           _this2.uiSegmentSrv = uiSegmentSrv;
           _this2.target.expandHelper = 0;
@@ -294,10 +293,10 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
           var _this = _assertThisInitialized(_this2);
 
           $(document).ready(function () {
-            //Give time for page to load before setting elements as sortable
+            //DOM needs to load before element can be set as sortable
             setTimeout(function () {
               _this.setSortable();
-            }, 2000);
+            }, 1000);
           });
 
           try {
@@ -442,11 +441,10 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
         }, {
           key: "updateFinalQuery",
           value: function updateFinalQuery(finalQuery) {
-            var qbs = new QueryBuilderService();
-            this.target.expr = qbs.substituteFinalQuery(finalQuery, this);
+            this.target.expr = substituteFinalQuery(finalQuery, this);
             this.panelCtrl.refresh();
             this.target.finalQuery = finalQuery;
-            return qbs.substituteFinalQuery(finalQuery, this);
+            return substituteFinalQuery(finalQuery, this);
           }
         }, {
           key: "suggestMetrics",

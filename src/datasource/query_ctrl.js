@@ -1,20 +1,19 @@
 import {QueryCtrl} from 'app/plugins/sdk';
 import './css/query-editor.css!';
 import Sortable from './../external/Sortable.min';
-import {QueryBuilderService} from "./queryBuilderService";
+import {substituteFinalQuery} from "./queryBuilderService";
 
 
 export class BosunDatasourceQueryCtrl extends QueryCtrl {
 
-  constructor($scope, $injector, uiSegmentSrv, $sce) {
-    super($scope, $injector, $sce);
+  constructor($scope, $injector, uiSegmentSrv) {
+    super($scope, $injector);
     this.scope = $scope;
-    this.sce = $sce;
     this.queryHelper = {};
     this.uiSegmentSrv = uiSegmentSrv;
     this.target.expandHelper = 0;
     this.target.target = this.target.target || 'Bosun Query';
-    this.deleteVariable = this.deleteVariable.bind( this);
+    this.deleteVariable = this.deleteVariable.bind(this);
     this.suggestMetrics = this.suggestMetrics.bind(this);
     this.addSuggest = this.addSuggest.bind(this);
     this.labelFromUnit = this.labelFromUnit.bind(this);
@@ -25,9 +24,9 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     this.getMetricSuggestions = this.getMetricSuggestions.bind(this);
     this.addTagBox = this.addTagBox.bind(this);
     this.filterTypes = ["Group By", "Filter"];
-    if(!this.target.variables){
+    if (!this.target.variables) {
       this.target.variables = [];
-    }else{
+    } else {
       this.target.variables = _.orderBy(this.target.variables, ['indexInUI'])
     }
     this.scope.aggOptions = [
@@ -40,36 +39,60 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     ];
     this.scope.fillPolicies = [{text: 'none'}, {text: 'nan'}, {text: 'null'}, {text: 'zero'}];
     this.scope.queryFunctions = [
-      {func: 'q', type:'seriesSet', args:{'query': 'string', 'startDuration': 'string', 'endDuration': 'string'}},
-      {func: 'band', type:'seriesSet', args:{'query': 'string', 'duration': 'string', 'period': 'string', 'num': 'scalar'}},
-      {func: 'over', type:'seriesSet', args:{'query': 'string', 'duration': 'string', 'period': 'string', 'num': 'scalar'}},
-      {func: 'shiftBand', type:'seriesSet', args:{'query': 'string', 'duration': 'string', 'period': 'string', 'num': 'scalar'}},
-      {func: 'change', type:'numberSet', args:{'query': 'string', 'startDuration': 'string', 'endDuration': 'string'}},
-      {func: 'count', type:'scalar', args:{'query': 'string', 'startDuration': 'string', 'endDuration': 'string'}},
-      {func: 'window', type:'seriesSet', args:{'query': 'string', 'duration': 'string', 'period': 'string', 'num': 'scalar', 'funcName': 'string'}},
+      {func: 'q', type: 'seriesSet', args: {'query': 'string', 'startDuration': 'string', 'endDuration': 'string'}},
+      {
+        func: 'band',
+        type: 'seriesSet',
+        args: {'query': 'string', 'duration': 'string', 'period': 'string', 'num': 'scalar'}
+      },
+      {
+        func: 'over',
+        type: 'seriesSet',
+        args: {'query': 'string', 'duration': 'string', 'period': 'string', 'num': 'scalar'}
+      },
+      {
+        func: 'shiftBand',
+        type: 'seriesSet',
+        args: {'query': 'string', 'duration': 'string', 'period': 'string', 'num': 'scalar'}
+      },
+      {
+        func: 'change',
+        type: 'numberSet',
+        args: {'query': 'string', 'startDuration': 'string', 'endDuration': 'string'}
+      },
+      {func: 'count', type: 'scalar', args: {'query': 'string', 'startDuration': 'string', 'endDuration': 'string'}},
+      {
+        func: 'window',
+        type: 'seriesSet',
+        args: {'query': 'string', 'duration': 'string', 'period': 'string', 'num': 'scalar', 'funcName': 'string'}
+      },
     ];
     this.scope.suggestions = [];
-    if(!this.target.varCounter){this.target.varCounter = 0;}
-    if(!this.target.finalQuery){
-      if(this.target.expr){
+    if (!this.target.varCounter) {
+      this.target.varCounter = 0;
+    }
+    if (!this.target.finalQuery) {
+      if (this.target.expr) {
         this.target.finalQuery = this.target.expr;
         this.target.expr = ""
-      }else{
+      } else {
         this.target.finalQuery = "";
       }
     }
     this.target.subbedQuery = "";
-    if(!this.target.flags){this.target.flags = "";}
+    if (!this.target.flags) {
+      this.target.flags = "";
+    }
     var _this = this;
-    $(document).ready(function(){
-      //Give time for page to load before setting elements as sortable
-      setTimeout(function(){
+    $(document).ready(function () {
+      //DOM needs to load before element can be set as sortable
+      setTimeout(function () {
         _this.setSortable();
-      }, 2000);
+      }, 1000);
     });
-    try{
+    try {
       this.updateFinalQuery(this.target.finalQuery);
-    }catch (e) {
+    } catch (e) {
       console.log(e)
     }
   }
@@ -84,15 +107,15 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     return target;
   }
 
-  htmlCollectionToListOfIds(htmlCollection){
+  htmlCollectionToListOfIds(htmlCollection) {
     var ret = [];
-    for(var i=0; i<htmlCollection.length; i++){
+    for (var i = 0; i < htmlCollection.length; i++) {
       ret.push(htmlCollection[i].id)
     }
     return ret;
   }
 
-  getVariablesFromUI(){
+  getVariablesFromUI() {
     return this.htmlCollectionToListOfIds(
       document.getElementById('allVariables').getElementsByTagName("li")
     );
@@ -100,14 +123,14 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
 
   ensureOrdering(variables) {
     this.setSortable();
-    var orderedListOfIds = this.getVariablesFromUI()
+    var orderedListOfIds = this.getVariablesFromUI();
     for (var i = 0; i < variables.length; i++) {
       variables[i].indexInUI = orderedListOfIds.indexOf(variables[i].id.toString())
     }
     return _.orderBy(variables, ['indexInUI'])
   }
 
-  setSortable(){
+  setSortable() {
     var el = document.getElementById('allVariables');
     let _this = this;
     Sortable.create(el, {
@@ -118,17 +141,17 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
   }
 
   getMetricSuggestions(typeahead) {
-    if(!this.datasource.openTSDBUrl){
+    if (!this.datasource.openTSDBUrl) {
       throw ReferenceError("Missing OpenTSDB URL")
     }
     var request = new Request(this.datasource.openTSDBUrl + "/suggest?type=metrics&q=" + typeahead);
 
     var the_scope = this.scope;
-    var req = fetch(request).then(function(response) {
+    var req = fetch(request).then(function (response) {
       return response.json();
-    }).then(function(responseSuggestions) {
+    }).then(function (responseSuggestions) {
       the_scope.suggestions = responseSuggestions;
-    }).catch(function(error) {
+    }).catch(function (error) {
       throw error;
     });
     return req
@@ -145,30 +168,30 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     this.target.variables = tmp;
   }
 
-  deleteTag(variableId, tagId, type){
+  deleteTag(variableId, tagId, type) {
     delete this.target.variables[variableId][type + "tagBoxes"][tagId]
   }
 
   addNewVariable(type) {
     var variables = this.target.variables;
-    const defaultVariable = {id: this.target.varCounter, type: type}
+    const defaultVariable = {id: this.target.varCounter, type: type};
     variables.push(defaultVariable);
     this.target.varCounter += 1;
     var _this = this;
 
     //timeout necessary as ng-repeat doesn't seem to provide a callback when updated
-    setTimeout(function(){
+    setTimeout(function () {
       variables = _this.ensureOrdering(variables);
     }, 100);
   }
 
-  addTagBox(queryId, type){
-    const defaultTagBox = {key: "", value: "", editorClosed: false}
+  addTagBox(queryId, type) {
+    const defaultTagBox = {key: "", value: "", editorClosed: false};
     var queryVariable = this.target.variables[queryId];
-    if(!queryVariable[type + "tagBoxes"]){
+    if (!queryVariable[type + "tagBoxes"]) {
       queryVariable[type + "tagBoxes"] = {}
     }
-    if(!queryVariable[type + "TagBoxCounter"]){
+    if (!queryVariable[type + "TagBoxCounter"]) {
       queryVariable[type + "TagBoxCounter"] = 0;
     }
     queryVariable[type + "tagBoxes"][queryVariable[type + "TagBoxCounter"]] = defaultTagBox;
@@ -176,11 +199,10 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
   }
 
   updateFinalQuery(finalQuery) {
-    var qbs = new QueryBuilderService();
-    this.target.expr = qbs.substituteFinalQuery(finalQuery, this);
+    this.target.expr = substituteFinalQuery(finalQuery, this);
     this.panelCtrl.refresh();
     this.target.finalQuery = finalQuery;
-    return qbs.substituteFinalQuery(finalQuery, this);
+    return substituteFinalQuery(finalQuery, this);
   }
 
   suggestMetrics(metric, callback) {
@@ -190,12 +212,14 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
   metricInfo() {
     return this.datasource._tagKeysForMetric(this.queryHelper.metric).then((tagKeys) => {
       this.datasource.q.all(_.map(tagKeys, (tagKey) => {
-        return this.datasource._tagValuesForMetricAndTagKey(this.queryHelper.metric, tagKey).then((tagValues) => {
-          return { key: tagKey, value: tagValues }
+          return this.datasource._tagValuesForMetricAndTagKey(this.queryHelper.metric, tagKey).then((tagValues) => {
+            return {key: tagKey, value: tagValues}
+          })
         })
-      })
       ).then((tagKeysToValues) => {
-        tagKeysToValues = _.each(tagKeysToValues, (v) => { v.filterType = "Group By" })
+        tagKeysToValues = _.each(tagKeysToValues, (v) => {
+          v.filterType = "Group By"
+        });
         this.queryHelper.tagKeysToValues = tagKeysToValues;
       })
     }).then(() => this.datasource._metricMetadata(this.queryHelper.metric).then((metadata) => {
@@ -252,5 +276,6 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     }
   }
 }
-export default { BosunDatasourceQueryCtrl }
+
+export default {BosunDatasourceQueryCtrl}
 BosunDatasourceQueryCtrl.templateUrl = 'datasource/partials/query.editor.html';

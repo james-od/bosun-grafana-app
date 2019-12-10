@@ -1,7 +1,6 @@
-import {QueryBuilderService} from "./../queryBuilderService";
+import {substituteFinalQuery} from "./../queryBuilderService";
 
 test('simple substitution in final query', () => {
-  var qbs = new QueryBuilderService();
   const myMock = jest.fn()
   const mocked_this = new myMock();
   mocked_this.target = {
@@ -10,11 +9,10 @@ test('simple substitution in final query', () => {
     ],
     variableOrder: []
   };
-  expect(qbs.substituteFinalQuery("$a", mocked_this)).toBe("1");
+  expect(substituteFinalQuery("$a", mocked_this)).toBe("1");
 });
 
 test('multiple simple substitutions in final query', () => {
-  var qbs = new QueryBuilderService();
   const myMock = jest.fn()
   const mocked_this = new myMock();
   mocked_this.target = {
@@ -25,11 +23,11 @@ test('multiple simple substitutions in final query', () => {
     ],
     variableOrder: []
   };
-  expect(qbs.substituteFinalQuery("$a$b$c", mocked_this)).toBe("123");
+  expect(substituteFinalQuery("$a$b$c", mocked_this)).toBe("123");
 });
 
 test('multiple nested substitutions', () => {
-  var qbs = new QueryBuilderService();
+
   const myMock = jest.fn()
   const mocked_this = new myMock();
   mocked_this.target = {
@@ -40,11 +38,11 @@ test('multiple nested substitutions', () => {
     ],
     variableOrder: []
   };
-  expect(qbs.substituteFinalQuery("$c", mocked_this)).toBe("11");
+  expect(substituteFinalQuery("$c", mocked_this)).toBe("11");
 });
 
 test('Complex substitutions', () => {
-  var qbs = new QueryBuilderService();
+
   const myMock = jest.fn()
   const mocked_this = new myMock();
   mocked_this.target = {
@@ -59,13 +57,13 @@ test('Complex substitutions', () => {
     ],
     variableOrder: []
   };
-  expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe(
+  expect(substituteFinalQuery("$q", mocked_this)).toBe(
     "q(\"avg:1h-avg:example.metric{}{tagName=hello}\", \"1h\", \"2h\")"
   );
 });
 
 test('Flags', () => {
-  var qbs = new QueryBuilderService();
+
   const myMock = jest.fn()
   const mocked_this = new myMock();
   mocked_this.target = {
@@ -78,12 +76,12 @@ test('Flags', () => {
     ],
     variableOrder: []
   };
-  expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe(
+  expect(substituteFinalQuery("$q", mocked_this)).toBe(
     "q(\"avg:$time-avg:rate{counter,,1}:example.metric{}{}\", \"$time\", \"2h\")"
   );
 });
 test('reordered complex substitution', () => {
-  var qbs = new QueryBuilderService();
+
   const myMock = jest.fn()
   const mocked_this = new myMock();
   mocked_this.target = {
@@ -99,13 +97,13 @@ test('reordered complex substitution', () => {
       }
     ],
   };
-  expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe(
+  expect(substituteFinalQuery("$q", mocked_this)).toBe(
     "q(\"avg:1h-avg:example.metric{}{tagName=$tagValue}\", \"1h\", \"2h\")"
   );
 });
 
 test('error case - query function not set', () => {
-  var qbs = new QueryBuilderService();
+
   const myMock = jest.fn()
   const mocked_this = new myMock();
   mocked_this.target = {
@@ -119,14 +117,14 @@ test('error case - query function not set', () => {
     variableOrder: []
   };
   try{
-    qbs.substituteFinalQuery("$q", mocked_this);
+    substituteFinalQuery("$q", mocked_this);
   }catch (e) {
     expect(e.message).toBe("Query function not set");
   }
 });
 
 test('query types with `num` arg are built correctly', () => {
-  var qbs = new QueryBuilderService();
+
   const myMock = jest.fn()
   const mocked_this = new myMock();
   mocked_this.target = {
@@ -141,13 +139,13 @@ test('query types with `num` arg are built correctly', () => {
     ],
     variableOrder: []
   };
-  expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe(
+  expect(substituteFinalQuery("$q", mocked_this)).toBe(
     "over(\"avg:1h-avg:example.metric{}{tagName=hello1}\", \"7d\", \"period\", 3)"
   );
 });
 
 test('Group tags', () => {
-  var qbs = new QueryBuilderService();
+
   const myMock = jest.fn()
   const mocked_this = new myMock();
   mocked_this.target = {
@@ -163,13 +161,13 @@ test('Group tags', () => {
     ],
     variableOrder: []
   };
-  expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe(
+  expect(substituteFinalQuery("$q", mocked_this)).toBe(
     "over(\"avg:1h-avg:example.metric{tagName1=hello1,tagName2=hello2}{}\", \"7d\", \"period\", 3)"
   );
 });
 
 test('Multiple of both tag types', () => {
-  var qbs = new QueryBuilderService();
+
   const myMock = jest.fn()
   const mocked_this = new myMock();
   mocked_this.target = {
@@ -186,7 +184,7 @@ test('Multiple of both tag types', () => {
     ],
     variableOrder: []
   };
-  expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe(
+  expect(substituteFinalQuery("$q", mocked_this)).toBe(
     "over(\"avg:1h-avg:example.metric{groupTag1=hello1,groupTag2=a}{filterTag1=b,filterTag2=hello2}\", \"7d\", \"period\", 3)"
   );
 });

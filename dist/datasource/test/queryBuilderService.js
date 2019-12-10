@@ -3,14 +3,13 @@
 System.register(["./../queryBuilderService"], function (_export, _context) {
   "use strict";
 
-  var QueryBuilderService;
+  var substituteFinalQuery;
   return {
     setters: [function (_queryBuilderService) {
-      QueryBuilderService = _queryBuilderService.QueryBuilderService;
+      substituteFinalQuery = _queryBuilderService.substituteFinalQuery;
     }],
     execute: function () {
       test('simple substitution in final query', function () {
-        var qbs = new QueryBuilderService();
         var myMock = jest.fn();
         var mocked_this = new myMock();
         mocked_this.target = {
@@ -22,10 +21,9 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
           }],
           variableOrder: []
         };
-        expect(qbs.substituteFinalQuery("$a", mocked_this)).toBe("1");
+        expect(substituteFinalQuery("$a", mocked_this)).toBe("1");
       });
       test('multiple simple substitutions in final query', function () {
-        var qbs = new QueryBuilderService();
         var myMock = jest.fn();
         var mocked_this = new myMock();
         mocked_this.target = {
@@ -50,10 +48,9 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
           }],
           variableOrder: []
         };
-        expect(qbs.substituteFinalQuery("$a$b$c", mocked_this)).toBe("123");
+        expect(substituteFinalQuery("$a$b$c", mocked_this)).toBe("123");
       });
       test('multiple nested substitutions', function () {
-        var qbs = new QueryBuilderService();
         var myMock = jest.fn();
         var mocked_this = new myMock();
         mocked_this.target = {
@@ -78,10 +75,9 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
           }],
           variableOrder: []
         };
-        expect(qbs.substituteFinalQuery("$c", mocked_this)).toBe("11");
+        expect(substituteFinalQuery("$c", mocked_this)).toBe("11");
       });
       test('Complex substitutions', function () {
-        var qbs = new QueryBuilderService();
         var myMock = jest.fn();
         var mocked_this = new myMock();
         mocked_this.target = {
@@ -119,10 +115,9 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
           }],
           variableOrder: []
         };
-        expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe("q(\"avg:1h-avg:example.metric{}{tagName=hello}\", \"1h\", \"2h\")");
+        expect(substituteFinalQuery("$q", mocked_this)).toBe("q(\"avg:1h-avg:example.metric{}{tagName=hello}\", \"1h\", \"2h\")");
       });
       test('Flags', function () {
-        var qbs = new QueryBuilderService();
         var myMock = jest.fn();
         var mocked_this = new myMock();
         mocked_this.target = {
@@ -144,10 +139,9 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
           }],
           variableOrder: []
         };
-        expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe("q(\"avg:$time-avg:rate{counter,,1}:example.metric{}{}\", \"$time\", \"2h\")");
+        expect(substituteFinalQuery("$q", mocked_this)).toBe("q(\"avg:$time-avg:rate{counter,,1}:example.metric{}{}\", \"$time\", \"2h\")");
       });
       test('reordered complex substitution', function () {
-        var qbs = new QueryBuilderService();
         var myMock = jest.fn();
         var mocked_this = new myMock();
         mocked_this.target = {
@@ -184,10 +178,9 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
             indexInUI: 1
           }]
         };
-        expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe("q(\"avg:1h-avg:example.metric{}{tagName=$tagValue}\", \"1h\", \"2h\")");
+        expect(substituteFinalQuery("$q", mocked_this)).toBe("q(\"avg:1h-avg:example.metric{}{tagName=$tagValue}\", \"1h\", \"2h\")");
       });
       test('error case - query function not set', function () {
-        var qbs = new QueryBuilderService();
         var myMock = jest.fn();
         var mocked_this = new myMock();
         mocked_this.target = {
@@ -209,13 +202,12 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
         };
 
         try {
-          qbs.substituteFinalQuery("$q", mocked_this);
+          substituteFinalQuery("$q", mocked_this);
         } catch (e) {
           expect(e.message).toBe("Query function not set");
         }
       });
       test('query types with `num` arg are built correctly', function () {
-        var qbs = new QueryBuilderService();
         var myMock = jest.fn();
         var mocked_this = new myMock();
         mocked_this.target = {
@@ -254,10 +246,9 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
           }],
           variableOrder: []
         };
-        expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe("over(\"avg:1h-avg:example.metric{}{tagName=hello1}\", \"7d\", \"period\", 3)");
+        expect(substituteFinalQuery("$q", mocked_this)).toBe("over(\"avg:1h-avg:example.metric{}{tagName=hello1}\", \"7d\", \"period\", 3)");
       });
       test('Group tags', function () {
-        var qbs = new QueryBuilderService();
         var myMock = jest.fn();
         var mocked_this = new myMock();
         mocked_this.target = {
@@ -300,10 +291,9 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
           }],
           variableOrder: []
         };
-        expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe("over(\"avg:1h-avg:example.metric{tagName1=hello1,tagName2=hello2}{}\", \"7d\", \"period\", 3)");
+        expect(substituteFinalQuery("$q", mocked_this)).toBe("over(\"avg:1h-avg:example.metric{tagName1=hello1,tagName2=hello2}{}\", \"7d\", \"period\", 3)");
       });
       test('Multiple of both tag types', function () {
-        var qbs = new QueryBuilderService();
         var myMock = jest.fn();
         var mocked_this = new myMock();
         mocked_this.target = {
@@ -361,7 +351,7 @@ System.register(["./../queryBuilderService"], function (_export, _context) {
           }],
           variableOrder: []
         };
-        expect(qbs.substituteFinalQuery("$q", mocked_this)).toBe("over(\"avg:1h-avg:example.metric{groupTag1=hello1,groupTag2=a}{filterTag1=b,filterTag2=hello2}\", \"7d\", \"period\", 3)");
+        expect(substituteFinalQuery("$q", mocked_this)).toBe("over(\"avg:1h-avg:example.metric{groupTag1=hello1,groupTag2=a}{filterTag1=b,filterTag2=hello2}\", \"7d\", \"period\", 3)");
       });
     }
   };
