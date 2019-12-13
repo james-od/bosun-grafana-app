@@ -405,7 +405,10 @@ System.register(["app/plugins/sdk", "./css/query-editor.css!", "./../external/So
             var variables = this.target.variables;
             var defaultVariable = {
               id: this.target.varCounter,
-              type: type
+              type: type,
+              startDuration: "$start",
+              duration: "$start",
+              downsampleTime: "$ds"
             };
             variables.push(defaultVariable);
             this.target.varCounter += 1;

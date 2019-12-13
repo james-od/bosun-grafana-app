@@ -174,7 +174,7 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
 
   addNewVariable(type) {
     var variables = this.target.variables;
-    const defaultVariable = {id: this.target.varCounter, type: type};
+    const defaultVariable = {id: this.target.varCounter, type: type, startDuration:"$start", duration:"$start", downsampleTime:"$ds"};
     variables.push(defaultVariable);
     this.target.varCounter += 1;
     var _this = this;
