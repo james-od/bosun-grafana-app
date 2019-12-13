@@ -22,7 +22,7 @@ pipeline:
     source: bosun-grafana-app-${DRONE_BRANCH}-${DRONE_BUILD_NUMBER}.tar.gz
     target: /artifacts/bosun-grafana-app/
     when:
-      repo: jamesodonnell/bosun-grafana-app
+      repo: data-platform/bosun-grafana-app
       event: push
       branch:
         exclude: [ master ]
@@ -39,7 +39,7 @@ pipeline:
     source: bosun-grafana-app-${DRONE_BRANCH}-${DRONE_BUILD_NUMBER}.tar.gz
     target: /artifacts/bosun-grafana-app/
     when:
-      repo: jamesodonnell/bosun-grafana-app
+      repo: data-platform/bosun-grafana-app
       branch: master
       event:
         exclude: pull_request
