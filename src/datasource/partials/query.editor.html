@@ -179,6 +179,14 @@
     <label class="gf-form-label" style="white-space: pre-line; height: fit-content;">{{ctrl.datasource.postQuery}}</label>
   </div>
 
+  <div class="gf-form" style="width:20%;">
+    <label class="gf-form-label query-keyword width-8">
+      Alias:<tip>Use patterns like $tag_tagname to replace part of the alias for a tag value</tip>
+    </label>
+    <input type="text" class="gf-form-input" ng-model="ctrl.target.alias" spellcheck='false' placeholder="series alias" data-min-length=0
+           data-items=100 ng-blur="ctrl.targetBlur()" ng-change="ctrl.onChangeInternal()"></input>
+  </div>
+
   </div>
   <div ng-if="ctrl.datasource.showHelper">
     <section class="grafana-metric-options gf-form-group">
