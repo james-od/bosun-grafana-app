@@ -5,10 +5,15 @@ clone:
 
 pipeline:
 
-  compress:
+  build-and-compress:
     image: 325714046698.dkr.ecr.eu-west-1.amazonaws.com/skyscanner/shell-ci:1.0.0
     pull: true
-    commands: tar czf bosun-grafana-app-${DRONE_BUILD_NUMBER}.tar.gz dist
+    commands:
+      - npm install
+      - npm install -g grunt-cli
+      - grunt
+      - npm run test
+      - tar czf bosun-grafana-app-${DRONE_BUILD_NUMBER}.tar.gz dist
 
   s3-sandbox:
     image: plugins/s3
