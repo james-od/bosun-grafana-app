@@ -10,6 +10,7 @@ pipeline:
     commands:
       - npm install
       - npm install -g grunt-cli
+      - grunt
       - npm run test
 
   compress:
