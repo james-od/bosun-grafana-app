@@ -5,6 +5,14 @@ clone:
 
 pipeline:
 
+  build-and-test:
+    image: node
+    commands:
+      - npm install
+      - npm install -g grunt-cli
+      - grunt
+      - npm run test
+
   compress:
     image: 325714046698.dkr.ecr.eu-west-1.amazonaws.com/skyscanner/shell-ci:1.0.0
     pull: true
