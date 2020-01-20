@@ -205,6 +205,18 @@ export class BosunDatasourceQueryCtrl extends QueryCtrl {
     return substituteFinalQuery(finalQuery, this);
   }
 
+  copyToClipboard(textToCopy) {
+    //Creates an input, writes text to it, copies to clipboard, deletes input
+    //https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
+    var input = document.createElement('input');
+    input.setAttribute('value', textToCopy);
+    document.body.appendChild(input);
+    input.select();
+    var result = document.execCommand('copy');
+    document.body.removeChild(input);
+    return result;
+  }
+
   suggestMetrics(metric, callback) {
     return this.datasource._metricsStartWith(metric).then(callback);
   }

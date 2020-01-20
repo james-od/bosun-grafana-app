@@ -11,6 +11,9 @@
             class="gf-form-input" rows="1" ng-model="variable.inputName" spellcheck="false" placeholder="variable name" data-min-length=0 data-items=150>
           <input
             class="gf-form-input" rows="1" ng-model="variable.inputValue" spellcheck='false' placeholder='value' data-min-length=0 data-items=150r>
+          <a class="gf-form-label" href="https://github.skyscannertools.net/data-platform/bosun-grafana-app#query-templating">
+            Help <i class="fa fa-question-circle"></i>
+          </a>
           <button class="gf-form-label" ng-click="ctrl.deleteVariable(variable.id);">
             <i class="fa fa-fw fa-trash"></i>
           </button>
@@ -26,6 +29,9 @@
             </label>
             <input
               class="gf-form-input" rows="1" ng-model="variable.inputValue" spellcheck="false" placeholder="query variable name" data-min-length=0 data-items=150>
+            <a class="gf-form-label" href="https://github.skyscannertools.net/data-platform/bosun-grafana-app#query-templating">
+              Help <i class="fa fa-question-circle"></i>
+            </a>
             <button class="gf-form-label" ng-click="ctrl.deleteVariable(variable.id);">
               <i class="fa fa-fw fa-trash" ng-click="ctrl.deleteVariable(variable.id);"></i>
             </button>
@@ -176,7 +182,12 @@
     <textarea class="gf-form-input" rows="3" ng-model="ctrl.target.finalQuery" spellcheck='false' placeholder='$query'
               data-min-length=0 data-items=15 ng-change="ctrl.updateFinalQuery(ctrl.target.finalQuery)" ng-click="ctrl.updateFinalQuery(ctrl.target.finalQuery)">
     </textarea>
-    <label class="gf-form-label" style="white-space: pre-line; height: fit-content;">{{ctrl.datasource.postQuery}}</label>
+  </div>
+
+  <div class="gf-form" style="width:20%;">
+    <button class="btn navbar-button" ng-click="ctrl.copyToClipboard(ctrl.datasource.postQuery)">
+      Copy Substituted Query <i class="fa fa-fw fa-clipboard"></i>
+    </button>
   </div>
 
   <div class="gf-form" style="width:20%;">
