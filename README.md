@@ -71,7 +71,11 @@ Bosun also needs a ElasticSearch backend in order for its annotations subsystem 
 
 ## Query Templating
 
-For users unfamiliar with Bosun syntax, query template blocks can be used. Simply click the `Query +` button and a
+For users unfamiliar with Bosun syntax, query template blocks can be used.
+
+Query templating blocks are still very much a work in progress - please raise any questions, bugs or thoughts for improvement in #data-platform-support. Currently they work best with simple queries.
+
+Simply click the `Query +` button and a
 new query block will appear.
   
 ![Query template example](src/img/queryTemplateExample.png)
@@ -91,6 +95,8 @@ can click and drag it above the query block.
 
 The free text box still works as before and no templating is required, templated variables and queries are just
 substituted in when referenced with their name - where the name begins with `$`.
+
+You can copy the substituted query straight to your clipboard with the 'copy substituted query' button - making the plugin useful for building a bosun query string without worrying about the syntax.
 
 
  
