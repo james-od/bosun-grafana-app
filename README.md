@@ -99,6 +99,6 @@ This redirects requests to the production opentsdb endpoint from the proxy url p
 
 Ensure front end assets have been built with `yarn start` then start Grafana `./bin/darwin-amd64/grafana-server`.
 
-Add a new dashboard and select the `Bosun Query-prod` datasource.
+Add a new dashboard and select the `Bosun` datasource.
 
 To run tests, `npm run test`.
