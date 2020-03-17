@@ -73,32 +73,6 @@ Bosun also needs a ElasticSearch backend in order for its annotations subsystem 
 
 For users unfamiliar with Bosun syntax, query template blocks can be used.
 
-Query templating blocks are still very much a work in progress - please raise any questions, bugs or thoughts for improvement in #data-platform-support. Currently they work best with simple queries.
-
-Simply click the `Query +` button and a
-new query block will appear.
-  
-![Query template example](src/img/queryTemplateExample.png)
-
-In the above example the query 
-
-`over("zimsum:1h-zimsum-zero:gap.redirects.summary{}{country=$Country}", "$start", "7d", 3)`
-
-is templated. The variable name is given as `$q` - variable names must be prepended with a dollar. This can then be
-called in the `Final Query` section.  
-
-If we wished to also make `$time` a templated variable then we could click the `Var +` button. This adds a new simple 
-variable block at the bottom. Blocks are read and their variables substituted in order, so to use this new `$time` block we 
-can click and drag it above the query block.
-
-![Click and Drag Ex](src/img/clickAndDrag.gif)
-
-The free text box still works as before and no templating is required, templated variables and queries are just
-substituted in when referenced with their name - where the name begins with `$`.
-
-You can copy the substituted query straight to your clipboard with the 'copy substituted query' button - making the plugin useful for building a bosun query string without worrying about the syntax.
-
-
  
 ## Local Development
 
