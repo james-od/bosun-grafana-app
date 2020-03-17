@@ -84,10 +84,10 @@ Run `npm install -g grunt-cli`
 
 Add the following to datasources.yml in Grafana to provide the plugin with a suitable mock datasource:
 ```
-  - name: Bosun Query-prod
+  - name: Bosun
     type: bosun-datasource
     access: proxy
-    url: https://bosun-query.slingshot.eu-west-1.prod.aws.skyscnr.com
+    url: <Bosun URL>
     jsonData:
       openTSDBUrl: http://localhost:8010/proxy
 ```
