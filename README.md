@@ -119,7 +119,7 @@ Add the following to datasources.yml in Grafana to provide the plugin with a sui
 ```
 Autocompletion suggestions for metrics are taken from the openTSDBUrl parameter provided. To prevent CORS errors, run the following:
 
-`lcp --proxyUrl http://opentsdb.skymetrics.prod.skyscanner.local:4242`
+`lcp --proxyUrl <openTSDB URL>`
 
 This redirects requests to the production opentsdb endpoint from the proxy url parameter provided above. 
 
